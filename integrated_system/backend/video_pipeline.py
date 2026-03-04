@@ -7,7 +7,7 @@ from analytics.vehicle_counter import VehicleCounter
 from analytics.people_counter import PeopleCounter
 from analytics.face_recognizer import FaceRecognizer
 from analytics.gender_classifier import GenderClassifier
-from database.db import get_db
+from database.db import SessionLocal
 from database.models import VehicleEvent, PeopleEvent, ANPRLog, FRSLog
 
 class VideoPipeline:
@@ -77,7 +77,7 @@ class VideoPipeline:
                             
                 if result["event"]:
                     # DB insert logic
-                    with get_db() as db:
+                    with SessionLocal() as db:
                         db.add(PeopleEvent(track_id=track_id, direction=result["event"], gender=gender))
                         if recognized_name != "Unknown":
                             db.add(FRSLog(track_id=track_id, recognized_name=recognized_name, confidence=1.0))
@@ -88,7 +88,7 @@ class VideoPipeline:
                 # Count
                 result = self.vehicle_counter.count_obj(box, track_id, cls)
                 if result["event"]:
-                    with get_db() as db:
+                    with SessionLocal() as db:
                         cls_name = {2: 'car', 3: 'motorcycle', 5: 'bus', 7: 'truck'}[cls]
                         db.add(VehicleEvent(track_id=track_id, vehicle_type=cls_name, direction=result["event"]))
                         db.commit()
@@ -106,7 +106,7 @@ class VideoPipeline:
                         
                         plate_text, score = self.plate_reader.read_plate(plate_crop)
                         if plate_text and score > 0.4:  # Threshold
-                            with get_db() as db:
+                            with SessionLocal() as db:
                                 # Quick check to not spam DB for same plate
                                 existing = db.query(ANPRLog).filter(ANPRLog.track_id == track_id).first()
                                 if not existing or existing.confidence < score:

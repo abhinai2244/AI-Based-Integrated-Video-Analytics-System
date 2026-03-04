@@ -1,0 +1,82 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Virtual Environments
+# =========================
+venv/
+env/
+ENV/
+.venv/
+.virtualenv/
+
+# =========================
+# Jupyter Notebook
+# =========================
+.ipynb_checkpoints
+
+# =========================
+# Dataset / Data
+# =========================
+data/
+datasets/
+*.csv
+*.tsv
+*.json
+*.zip
+*.tar
+*.gz
+
+# =========================
+# Model Files
+# =========================
+models/
+checkpoints/
+*.h5
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pb
+*.joblib
+*.pkl
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+tensorboard_logs/
+runs/
+
+# =========================
+# Temporary Files
+# =========================
+*.tmp
+*.temp
+*.swp
+.DS_Store
+Thumbs.db
+
+# =========================
+# Build / Dist
+# =========================
+build/
+dist/
+*.egg-info/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
