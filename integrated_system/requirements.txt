@@ -1,0 +1,10 @@
+fastapi>=0.103.0
+uvicorn>=0.23.2
+ultralytics>=8.0.0
+easyocr>=1.7.0
+streamlit>=1.26.0
+opencv-python-headless>=4.8.0
+sqlalchemy>=2.0.0
+pandas>=2.0.0
+python-multipart>=0.0.6
+websockets>=11.0.3
