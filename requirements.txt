@@ -2,7 +2,10 @@ flask==3.1.0
 ultralytics==8.3.0
 easyocr==1.7.2
 deepface==0.0.93
-opencv-python==4.10.0.84
+opencv-python-headless==4.10.0.84
 numpy==1.26.4
 Pillow==11.0.0
 tf-keras==2.18.0
+gunicorn==21.2.0
+torch
+torchvision
