@@ -2,7 +2,6 @@
 
 A high-performance AI video analytics dashboard designed for real-time and file-based processing. The system integrates advanced object detection, facial analysis, and regional optimizations for robust deployment in diverse traffic and crowd scenarios.
 
-![Architecture Overview](static/images/vehicle_architecture.png)
 
 ## 🚀 Features
 
