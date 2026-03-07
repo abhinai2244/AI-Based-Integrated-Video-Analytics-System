@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analytics — Modules</title>
+    <meta name="description"
+        content="AI module deep-dives with live demo capabilities for vehicle detection, ANPR, facial recognition, and people counting.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Analyzing image with AI models...</div>
+    </div>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/modules" class="nav-item">
+                    <i class="fas fa-cubes"></i> Modules
+                </a>
+                <a href="/stream" class="nav-item">
+                    <i class="fas fa-video"></i> Live Analysis
+                </a>
+                <a href="/architecture" class="nav-item"><i class="fas fa-project-diagram"></i> Architecture</a>
+                <a href="/roadmap" class="nav-item"><i class="fas fa-road"></i> Roadmap</a>
+                <a href="/specs" class="nav-item"><i class="fas fa-file-alt"></i> Specifications</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    System Online — All Modules Active
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Page Header -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon cyan"><i class="fas fa-cubes"></i></div>
+                    <div>
+                        <div class="section-title">AI Module Deep Dive</div>
+                        <div class="section-subtitle">Explore each module's technical specs and try live AI demos</div>
+                    </div>
+                </div>
+
+                <!-- Module Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tab-vehicle" onclick="switchTab('tab-vehicle')">
+                        <i class="fas fa-car-side"></i> Vehicle Counter
+                    </button>
+                    <button class="tab-btn" data-tab="tab-anpr" onclick="switchTab('tab-anpr')">
+                        <i class="fas fa-id-card"></i> ANPR
+                    </button>
+                    <button class="tab-btn" data-tab="tab-face" onclick="switchTab('tab-face')">
+                        <i class="fas fa-user-shield"></i> Facial Recognition
+                    </button>
+                    <button class="tab-btn" data-tab="tab-people" onclick="switchTab('tab-people')">
+                        <i class="fas fa-users"></i> People Counter
+                    </button>
+                    <button class="tab-btn" data-tab="tab-video" onclick="switchTab('tab-video')">
+                        <i class="fas fa-video"></i> Video Analysis
+                    </button>
+                </div>
+
+                <!-- ═══ Vehicle Counter Tab ═══ -->
+                <div class="tab-pane active" id="tab-vehicle">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Detects and classifies vehicles in real-time using <strong
+                                    style="color:var(--accent-cyan)">YOLOv8 Nano</strong>.
+                                Supports car, motorcycle, bus, and truck classification with bounding box annotations.
+                                Optimized for edge deployment via model quantization.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Mean Average Precision</span>
+                                        <span class="progress-label-value">92%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="92%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Processing Speed</span>
+                                        <span class="progress-label-value">45 FPS</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="90%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Edge Optimization</span>
+                                        <span class="progress-label-value">INT8 Quantized</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill blue" data-width="85%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">AI Model</td>
+                                        <td>YOLOv8 Nano (6.3M params)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Input</td>
+                                        <td>1080p / 4K @ 30 FPS</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Classes</td>
+                                        <td>Car, Motorcycle, Bus, Truck</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Accuracy</td>
+                                        <td><span class="badge green">mAP > 90%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Latency</td>
+                                        <td>
+                                            < 2 seconds</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Optimization</td>
+                                        <td>Quantization, Pruning, Federated Learning</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Edge Device</td>
+                                        <td>NVIDIA Jetson, Coral USB</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Live Demo -->
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-cyan)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="vehicleUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop an image or video here or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div class="results-panel" id="vehicleResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <img class="result-image" alt="Annotated vehicle detection result">
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(6,214,160,0.12);color:var(--accent-cyan)">
+                                            <i class="fas fa-car"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">Total Vehicles Detected</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:4px">
+                                        <i class="fas fa-list" style="color:var(--accent-cyan)"></i> Detection Breakdown
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ ANPR Tab ═══ -->
+                <div class="tab-pane" id="tab-anpr">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-blue)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Detects license plates using contour analysis and extracts text with <strong
+                                    style="color:var(--accent-blue)">EasyOCR</strong>.
+                                Supports multi-regional plate formats with adaptive preprocessing for motion blur and
+                                occlusion.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">OCR Accuracy (Ideal)</span>
+                                        <span class="progress-label-value">95%+</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill blue" data-width="95%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Plate Detection Rate</span>
+                                        <span class="progress-label-value">88%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="88%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Multi-Regional Support</span>
+                                        <span class="progress-label-value">40+ Formats</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="80%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-blue)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Detection</td>
+                                        <td>Contour Analysis + YOLOv8</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">OCR Engine</td>
+                                        <td>EasyOCR (Neural Network)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Preprocessing</td>
+                                        <td>Bilateral Filter, Adaptive Threshold</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Accuracy</td>
+                                        <td><span class="badge blue">>95% OCR Accuracy</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Plate Formats</td>
+                                        <td>EU, US, Indian, Asian, Middle East</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Integration</td>
+                                        <td>Toll Collection, Parking, Violations</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Flagging</td>
+                                        <td>Low-confidence → Manual Review</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-blue)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="anprUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop image or video with plates or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div class="results-panel" id="anprResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <img class="result-image" alt="ANPR annotated result">
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(59,130,246,0.12);color:var(--accent-blue)">
+                                            <i class="fas fa-id-card"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">Plates Detected</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:4px">
+                                        <i class="fas fa-list" style="color:var(--accent-blue)"></i> Recognized Plates
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Face Recognition Tab ═══ -->
+                <div class="tab-pane" id="tab-face">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-purple)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Advanced face analysis powered by <strong
+                                    style="color:var(--accent-purple)">DeepFace</strong> with VGG-Face backend.
+                                Extracts age, gender, dominant emotion, and ethnicity. Privacy-compliant with audit
+                                logging.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Recognition Accuracy</span>
+                                        <span class="progress-label-value">99%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="99%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Bias Mitigation Score</span>
+                                        <span class="progress-label-value">94%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="94%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Privacy Compliance</span>
+                                        <span class="progress-label-value">GDPR + CCPA</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill blue" data-width="100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-purple)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Framework</td>
+                                        <td>DeepFace + OpenCV</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Backend</td>
+                                        <td>VGG-Face / FaceNet</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Analysis</td>
+                                        <td>Age, Gender, Emotion, Race</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Accuracy</td>
+                                        <td><span class="badge purple">99% on LFW</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Compliance</td>
+                                        <td>GDPR, CCPA, Consent-Based</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Bias Testing</td>
+                                        <td>Cross-Demographic Evaluation</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Output</td>
+                                        <td>Alerts, Audit Logs, Matches</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-purple)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="faceUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop photo or video with faces or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div class="results-panel" id="faceResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <img class="result-image" alt="Face recognition annotated result">
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(139,92,246,0.12);color:var(--accent-purple)">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">Faces Detected</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:4px">
+                                        <i class="fas fa-list" style="color:var(--accent-purple)"></i> Face Analysis
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ People Counter Tab ═══ -->
+                <div class="tab-pane" id="tab-people">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-orange)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Real-time people counting using <strong style="color:var(--accent-orange)">YOLOv8
+                                    Nano</strong> with crowd density heatmap generation.
+                                Provides density level estimation (Low/Medium/High/Very High) for crowd management.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Detection Accuracy</span>
+                                        <span class="progress-label-value">91%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill orange" data-width="91%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Gender Classification</span>
+                                        <span class="progress-label-value">90%+</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="90%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Crowd Robustness</span>
+                                        <span class="progress-label-value">High Density</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="87%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-orange)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">AI Model</td>
+                                        <td>YOLOv8 Nano + DeepFace</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Tracking</td>
+                                        <td>Kalman Filter, Blob Analysis</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Outputs</td>
+                                        <td>Count, Density, Heatmap</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Gender Acc.</td>
+                                        <td><span class="badge orange">>90%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Environments</td>
+                                        <td>Stations, Malls, Events</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Density Levels</td>
+                                        <td>Low / Medium / High / Very High</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Visualization</td>
+                                        <td>JET Colormap Heatmaps</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-orange)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="peopleUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop image or video with people or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div class="results-panel" id="peopleResults">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+                                <div class="result-stat">
+                                    <div class="result-stat-icon"
+                                        style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div>
+                                        <div class="result-stat-value total-count">0</div>
+                                        <div class="result-stat-label">People Detected</div>
+                                    </div>
+                                </div>
+                                <div class="result-stat">
+                                    <div class="result-stat-icon"
+                                        style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">
+                                        <i class="fas fa-chart-area"></i>
+                                    </div>
+                                    <div>
+                                        <div class="result-stat-value density-value">—</div>
+                                        <div class="result-stat-label">Crowd Density</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div
+                                        style="padding:8px 12px;font-size:12px;color:var(--text-muted);background:rgba(0,0,0,0.3)">
+                                        <i class="fas fa-crosshairs"></i> Detection View
+                                    </div>
+                                    <img class="result-image" alt="People detection annotated result">
+                                </div>
+                                <div class="result-image-container">
+                                    <div
+                                        style="padding:8px 12px;font-size:12px;color:var(--text-muted);background:rgba(0,0,0,0.3)">
+                                        <i class="fas fa-fire"></i> Density Heatmap
+                                    </div>
+                                    <img class="heatmap-image" alt="Crowd density heatmap">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Video Analysis Tab ═══ -->
+                <div class="tab-pane" id="tab-video">
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-info-circle" style="color:var(--accent-pink)"></i>
+                            <span class="glass-card-title">Unified Video Analysis</span>
+                        </div>
+                        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7">
+                            Upload a video file and the system will extract key frames and run <strong>all 4 AI
+                                modules</strong> simultaneously:
+                            Vehicle Detection, ANPR, Facial Recognition, and People Counting. Results are aggregated
+                            across sampled frames.
+                        </p>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-film" style="color:var(--accent-pink)"></i>
+                            <span class="glass-card-title">Upload Video for Analysis</span>
+                        </div>
+                        <div class="upload-zone" id="videoUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="upload-zone-text">Drop a video file here or click to upload</div>
+                            <div class="upload-zone-hint">Supports MP4, AVI, MOV, MKV, WebM — Max 50MB</div>
+                            <input type="file" accept="video/*">
+                        </div>
+                    </div>
+
+                    <!-- Video Results -->
+                    <div class="results-panel" id="videoResults">
+                        <!-- Video Info -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Video Information</span>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px"
+                                id="videoInfoGrid">
+                            </div>
+                        </div>
+
+                        <!-- Summary Cards -->
+                        <div class="stats-grid" style="margin-bottom:24px">
+                            <div class="stat-card cyan">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon cyan"><i class="fas fa-car"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoVehicleCount">0</div>
+                                <div class="stat-card-label">Total Vehicles</div>
+                            </div>
+                            <div class="stat-card blue">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon blue"><i class="fas fa-id-card"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoPlateCount">0</div>
+                                <div class="stat-card-label">Unique Plates</div>
+                            </div>
+                            <div class="stat-card purple">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon purple"><i class="fas fa-user-shield"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoFaceCount">0</div>
+                                <div class="stat-card-label">Faces Detected</div>
+                            </div>
+                            <div class="stat-card orange">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon orange"><i class="fas fa-users"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoPeopleCount">0</div>
+                                <div class="stat-card-label">Max People Count</div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Breakdown -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-car-side" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Vehicle Breakdown</span>
+                            </div>
+                            <div id="videoVehicleBreakdown" class="detections-list"></div>
+                        </div>
+
+                        <!-- Plates Detected -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-id-card" style="color:var(--accent-blue)"></i>
+                                <span class="glass-card-title">License Plates Detected</span>
+                            </div>
+                            <div id="videoPlatesList" class="detections-list"></div>
+                        </div>
+
+                        <!-- Faces Detected -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-user-shield" style="color:var(--accent-purple)"></i>
+                                <span class="glass-card-title">Faces Analyzed</span>
+                            </div>
+                            <div id="videoFacesList" class="detections-list"></div>
+                        </div>
+
+                        <!-- People Density -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-users" style="color:var(--accent-orange)"></i>
+                                <span class="glass-card-title">Crowd Analysis</span>
+                            </div>
+                            <div id="videoPeopleSummary"></div>
+                        </div>
+
+                        <!-- Annotated Frames -->
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-images" style="color:var(--accent-pink)"></i>
+                                <span class="glass-card-title">Analyzed Frame Previews</span>
+                            </div>
+                            <div id="videoFramePreviews"
+                                style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize image upload zones
+            initUploadZone('vehicleUpload', '/api/detect-vehicles', renderVehicleResults);
+            initUploadZone('anprUpload', '/api/anpr', renderANPRResults);
+            initUploadZone('faceUpload', '/api/recognize-face', renderFaceResults);
+            initUploadZone('peopleUpload', '/api/count-people', renderPeopleResults);
+
+            // Initialize video upload zone
+            initVideoUpload();
+        });
+
+        function initVideoUpload() {
+            const zone = document.getElementById('videoUpload');
+            if (!zone) return;
+            const input = zone.querySelector('input[type="file"]');
+
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault(); zone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) processVideoUpload(e.dataTransfer.files[0]);
+            });
+            if (input) {
+                input.addEventListener('change', (e) => {
+                    if (e.target.files.length) processVideoUpload(e.target.files[0]);
+                });
+            }
+        }
+
+        function processVideoUpload(file) {
+            const validTypes = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm'];
+            if (!file.type.startsWith('video/')) {
+                showNotification('Please upload a video file (MP4, AVI, MOV, MKV, WebM)', 'error');
+                return;
+            }
+            if (file.size > 50 * 1024 * 1024) {
+                showNotification('File too large. Max 50MB.', 'error');
+                return;
+            }
+
+            showLoading(true);
+            const formData = new FormData();
+            formData.append('video', file);
+
+            fetch('/api/analyze-video', { method: 'POST', body: formData })
+                .then(res => { if (!res.ok) throw new Error(`Server error: ${res.status}`); return res.json(); })
+                .then(data => {
+                    showLoading(false);
+                    if (data.error) { showNotification(data.error, 'error'); }
+                    else { renderVideoResults(data); showNotification('Video analysis complete!', 'success'); }
+                })
+                .catch(err => { showLoading(false); showNotification('Video analysis failed: ' + err.message, 'error'); });
+        }
+
+        function renderVideoResults(data) {
+            const panel = document.getElementById('videoResults');
+            if (!panel) return;
+            panel.classList.add('visible');
+
+            // Video info
+            const info = data.video_info || {};
+            document.getElementById('videoInfoGrid').innerHTML = [
+                { l: 'Duration', v: info.duration + 's', c: 'cyan' },
+                { l: 'FPS', v: info.fps, c: 'blue' },
+                { l: 'Resolution', v: info.resolution, c: 'purple' },
+                { l: 'Total Frames', v: info.total_frames?.toLocaleString(), c: 'orange' },
+                { l: 'Frames Analyzed', v: info.frames_analyzed, c: 'pink' }
+            ].map(i => `<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:10px;padding:14px;text-align:center">
+                <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:4px">${i.v}</div>
+                <div style="font-size:11px;color:var(--text-muted)">${i.l}</div>
+            </div>`).join('');
+
+            // Summary counts
+            const vs = data.vehicle_summary || {};
+            document.getElementById('videoVehicleCount').textContent = vs.total || 0;
+            document.getElementById('videoPlateCount').textContent = data.anpr_summary?.total_unique || 0;
+            document.getElementById('videoFaceCount').textContent = data.face_summary?.total_detected || 0;
+            document.getElementById('videoPeopleCount').textContent = data.people_summary?.max_count || 0;
+
+            // Vehicle breakdown
+            const vColors = { car: '#06d6a0', motorcycle: '#f59e0b', bus: '#3b82f6', truck: '#8b5cf6' };
+            const vCounts = vs.counts || {};
+            document.getElementById('videoVehicleBreakdown').innerHTML = Object.entries(vCounts).map(([t, c]) =>
+                `<div class="detection-item"><span class="detection-item-label"><span class="detection-dot" style="background:${vColors[t] || '#06d6a0'}"></span>${t.charAt(0).toUpperCase() + t.slice(1)}</span><span class="detection-conf">${c}</span></div>`
+            ).join('') || '<div style="color:var(--text-muted);font-size:13px">No vehicles detected</div>';
+
+            // Plates list
+            const plates = data.anpr_summary?.plates || [];
+            document.getElementById('videoPlatesList').innerHTML = plates.map(p =>
+                `<div class="detection-item"><span class="detection-item-label"><span class="detection-dot" style="background:#3b82f6"></span><strong>${p.text}</strong> <span style="color:var(--text-muted);font-size:11px">@ ${p.timestamp}s</span></span><span class="detection-conf">${(p.confidence * 100).toFixed(1)}%</span></div>`
+            ).join('') || '<div style="color:var(--text-muted);font-size:13px">No plates detected</div>';
+
+            // Faces list
+            const faces = data.face_summary?.faces || [];
+            document.getElementById('videoFacesList').innerHTML = faces.map(f =>
+                `<div class="detection-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+                    <span class="detection-item-label"><span class="detection-dot" style="background:#8b5cf6"></span><strong>Face #${f.id}</strong> <span style="color:var(--text-muted);font-size:11px">@ ${f.timestamp}s</span></span>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;padding-left:16px">
+                        <span class="meta-tag"><i class="fas fa-birthday-cake"></i> Age: ${f.age}</span>
+                        <span class="meta-tag"><i class="fas fa-venus-mars"></i> ${f.gender}</span>
+                        <span class="meta-tag"><i class="fas fa-smile"></i> ${f.emotion}</span>
+                    </div>
+                </div>`
+            ).join('') || '<div style="color:var(--text-muted);font-size:13px">No faces detected</div>';
+
+            // People summary
+            const ps = data.people_summary || {};
+            document.getElementById('videoPeopleSummary').innerHTML = `
+                <div style="display:flex;gap:20px;flex-wrap:wrap">
+                    <div class="result-stat" style="flex:1">
+                        <div class="result-stat-icon" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)"><i class="fas fa-users"></i></div>
+                        <div><div class="result-stat-value">${ps.max_count || 0}</div><div class="result-stat-label">Peak People Count</div></div>
+                    </div>
+                    <div class="result-stat" style="flex:1">
+                        <div class="result-stat-icon" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)"><i class="fas fa-chart-area"></i></div>
+                        <div><div class="result-stat-value">${ps.max_density || 'N/A'}</div><div class="result-stat-label">Peak Crowd Density</div></div>
+                    </div>
+                </div>`;
+
+            // Frame previews
+            const frames = data.frame_results || [];
+            document.getElementById('videoFramePreviews').innerHTML = frames.map(fr => {
+                let img = fr.vehicle_annotated || fr.people_annotated || fr.face_annotated || '';
+                if (!img) return '';
+                return `<div style="border:1px solid var(--border-glass);border-radius:12px;overflow:hidden">
+                    <div style="padding:8px 12px;font-size:12px;color:var(--text-muted);background:rgba(0,0,0,0.3)"><i class="fas fa-clock"></i> Frame @ ${fr.timestamp}s — ${fr.vehicles || 0} vehicles, ${fr.people || 0} people, ${fr.faces || 0} faces</div>
+                    <img src="data:image/jpeg;base64,${img}" style="width:100%;display:block" alt="Analyzed frame at ${fr.timestamp}s">
+                </div>`;
+            }).join('') || '<div style="color:var(--text-muted);font-size:13px">No frames to preview</div>';
+        }
+    </script>
+</body>
+
+</html>

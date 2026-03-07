@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analytics — Live Streaming Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .live-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .stream-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+
+        .stream-controls {
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .analysis-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .live-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .live-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @media (max-width: 1024px) {
+            .live-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/modules" class="nav-item"><i class="fas fa-cubes"></i> Modules</a>
+                <a href="/stream" class="nav-item active"><i class="fas fa-video"></i> Live Analysis</a>
+                <a href="/architecture" class="nav-item"><i class="fas fa-project-diagram"></i> Architecture</a>
+                <a href="/roadmap" class="nav-item"><i class="fas fa-road"></i> Roadmap</a>
+                <a href="/specs" class="nav-item"><i class="fas fa-file-alt"></i> Specifications</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon purple"><i class="fas fa-video"></i></div>
+                    <div>
+                        <div class="section-title">Live Video Stream Analysis</div>
+                        <div class="section-subtitle">Real-time parallel processing of local video streams</div>
+                    </div>
+                </div>
+
+                <div class="live-grid">
+                    <!-- Left: Stream -->
+                    <div class="stream-container glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-purple)"></i>
+                            <span class="glass-card-title">Video Source</span>
+                        </div>
+                        <video id="liveVideo" class="video-player" controls>
+                            <source src="/serve-video/input.mp4" type="video/mp4">
+                        </video>
+                        <div class="stream-controls">
+                            <select id="videoSelect" class="data-table"
+                                style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px;border-radius:8px;width:100%">
+                                <option value="input.mp4">input.mp4 (Local Directory)</option>
+                            </select>
+                            <button id="startBtn" class="tab-btn active"
+                                style="padding: 10px 20px; white-space: nowrap;">
+                                <i class="fas fa-sync"></i> Sync AI
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Live Dashboard -->
+                    <div class="analysis-dashboard">
+                        <div class="analysis-card">
+                            <div class="live-label"><span class="live-dot"></span> Vehicle Module</div>
+                            <div class="live-value" id="liveVehicle">0</div>
+                            <div style="font-size:12px;color:var(--text-muted)" id="liveVehicleType">Waiting for data...
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="live-label" style="color:var(--accent-blue)"><span class="live-dot"
+                                    style="background:var(--accent-blue)"></span> ANPR Module</div>
+                            <div class="live-value" style="font-size:18px; color:var(--accent-blue)" id="liveANPR">NO
+                                DATA</div>
+                            <div style="font-size:12px;color:var(--text-muted)" id="liveANPRConf">—</div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="live-label" style="color:var(--accent-purple)"><span class="live-dot"
+                                    style="background:var(--accent-purple)"></span> Face Recognition</div>
+                            <div class="live-value" id="liveFace">0</div>
+                            <div style="font-size:12px;color:var(--text-muted)" id="liveFaceMeta">Waiting...</div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="live-label" style="color:var(--accent-orange)"><span class="live-dot"
+                                    style="background:var(--accent-orange)"></span> People Counter</div>
+                            <div class="live-value" id="livePeople">0</div>
+                            <div style="font-size:12px;color:var(--text-muted)" id="livePeopleDensity">Density: —</div>
+                        </div>
+
+                        <!-- Mini Preview Frame -->
+                        <div class="analysis-card"
+                            style="grid-column: span 2; padding: 0; overflow: hidden; height: 180px;">
+                            <canvas id="snapshotCanvas" style="display:none;"></canvas>
+                            <div id="statusOverlay"
+                                style="padding:10px; font-size:12px; color:var(--accent-cyan); font-weight: 600;">
+                                <i class="fas fa-microchip"></i> AI PROCESSING STATUS: <span id="syncStatus">IDLE</span>
+                            </div>
+                            <div
+                                style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4);">
+                                <i class="fas fa-brain fa-3x" style="opacity:0.2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('liveVideo');
+            const canvas = document.getElementById('snapshotCanvas');
+            const startBtn = document.getElementById('startBtn');
+            const syncStatus = document.getElementById('syncStatus');
+
+            let isSyncing = false;
+            let syncInterval = null;
+
+            startBtn.addEventListener('click', () => {
+                isSyncing = !isSyncing;
+                startBtn.classList.toggle('active', isSyncing);
+                startBtn.innerHTML = isSyncing ? '<i class="fas fa-stop-circle"></i> Stop AI' : '<i class="fas fa-sync"></i> Sync AI';
+
+                if (isSyncing) {
+                    syncStatus.textContent = 'ACTIVE';
+                    analyzeCurrentFrame(); // Start the recursive chain
+                } else {
+                    syncStatus.textContent = 'IDLE';
+                }
+            });
+
+            async function analyzeCurrentFrame() {
+                if (!isSyncing) return;
+                if (video.paused || video.ended) {
+                    // If video is paused, wait and try again
+                    setTimeout(analyzeCurrentFrame, 1000);
+                    return;
+                }
+
+                syncStatus.textContent = 'PROCESSING...';
+
+                // Draw current frame to canvas
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert to blob
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('image', blob, 'frame.jpg');
+
+                    try {
+                        const response = await fetch('/api/analyze-frame', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+
+                        if (data.error) throw new Error(data.error);
+
+                        updateLiveDashboard(data);
+                        syncStatus.textContent = 'SYNCED';
+
+                        // Analysis complete, schedule next frame after a short delay
+                        if (isSyncing) setTimeout(analyzeCurrentFrame, 1000);
+                    } catch (err) {
+                        console.error('Frame analysis failed:', err);
+                        syncStatus.textContent = 'ERROR - RETRYING';
+                        if (isSyncing) setTimeout(analyzeCurrentFrame, 2000);
+                    }
+                }, 'image/jpeg', 0.8);
+            }
+
+            function updateLiveDashboard(data) {
+                // Update Vehicles
+                document.getElementById('liveVehicle').textContent = data.vehicles.total || 0;
+                const vTypes = Object.entries(data.vehicles.counts || {})
+                    .filter(([k, v]) => v > 0)
+                    .map(([k, v]) => `${k}:${v}`)
+                    .join(', ');
+                document.getElementById('liveVehicleType').textContent = vTypes || 'None detected';
+
+                // Update ANPR
+                if (data.anpr.plates && data.anpr.plates.length > 0) {
+                    document.getElementById('liveANPR').textContent = data.anpr.plates[0].text;
+                    document.getElementById('liveANPRConf').textContent = `Confidence: ${(data.anpr.plates[0].confidence * 100).toFixed(0)}%`;
+                } else {
+                    document.getElementById('liveANPR').textContent = 'NO DATA';
+                    document.getElementById('liveANPRConf').textContent = '—';
+                }
+
+                // Update Faces
+                document.getElementById('liveFace').textContent = data.faces.total_faces || 0;
+                if (data.faces.faces && data.faces.faces.length > 0) {
+                    const f = data.faces.faces[0];
+                    document.getElementById('liveFaceMeta').textContent = `${f.gender}, ${f.age}y, ${f.emotion}`;
+                } else {
+                    document.getElementById('liveFaceMeta').textContent = 'None detected';
+                }
+
+                // Update People
+                document.getElementById('livePeople').textContent = data.people.total_people || 0;
+                document.getElementById('livePeopleDensity').textContent = `Density: ${data.people.density || '—'}`;
+            }
+
+            // Handle dropdown change
+            document.getElementById('videoSelect').addEventListener('change', (e) => {
+                video.src = '/serve-video/' + e.target.value;
+                video.load();
+                if (isSyncing) startBtn.click(); // Stop sync on source change
+            });
+        });
+    </script>
+</body>
+
+</html>

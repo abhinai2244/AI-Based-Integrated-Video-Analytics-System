@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analytics — Architecture</title>
+    <meta name="description"
+        content="System architecture visualization for AI-based integrated video analytics — edge, server, and hybrid deployment models.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+    <div class="app-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/modules" class="nav-item">
+                    <i class="fas fa-cubes"></i> Modules
+                </a>
+                <a href="/stream" class="nav-item">
+                    <i class="fas fa-video"></i> Live Analysis
+                </a>
+                <a href="/architecture" class="nav-item active"><i class="fas fa-project-diagram"></i> Architecture</a>
+                <a href="/roadmap" class="nav-item"><i class="fas fa-road"></i> Roadmap</a>
+                <a href="/specs" class="nav-item"><i class="fas fa-file-alt"></i> Specifications</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="system-status"><span class="status-dot"></span> System Online</div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Header -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon blue"><i class="fas fa-project-diagram"></i></div>
+                    <div>
+                        <div class="section-title">System Architecture</div>
+                        <div class="section-subtitle">Edge-to-cloud processing pipeline and deployment models</div>
+                    </div>
+                </div>
+
+                <!-- Architecture Flow Diagram -->
+                <div class="glass-card" style="margin-bottom:28px">
+                    <div class="glass-card-header">
+                        <i class="fas fa-sitemap" style="color:var(--accent-cyan)"></i>
+                        <span class="glass-card-title">Data Flow Pipeline</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:20px 0">
+                        <!-- Stage 1 -->
+                        <div
+                            style="background:rgba(6,214,160,0.08);border:1px solid rgba(6,214,160,0.2);border-radius:12px;padding:16px 20px;text-align:center;min-width:140px">
+                            <i class="fas fa-video"
+                                style="font-size:24px;color:var(--accent-cyan);display:block;margin-bottom:8px"></i>
+                            <div style="font-size:13px;font-weight:600">Camera Feeds</div>
+                            <div style="font-size:11px;color:var(--text-muted)">1080p / 4K @ 30fps</div>
+                        </div>
+                        <i class="fas fa-arrow-right" style="color:var(--text-muted);font-size:20px"></i>
+                        <!-- Stage 2 -->
+                        <div
+                            style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:16px 20px;text-align:center;min-width:140px">
+                            <i class="fas fa-microchip"
+                                style="font-size:24px;color:var(--accent-blue);display:block;margin-bottom:8px"></i>
+                            <div style="font-size:13px;font-weight:600">Edge Processing</div>
+                            <div style="font-size:11px;color:var(--text-muted)">YOLOv8 Nano</div>
+                        </div>
+                        <i class="fas fa-arrow-right" style="color:var(--text-muted);font-size:20px"></i>
+                        <!-- Stage 3 -->
+                        <div
+                            style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:16px 20px;text-align:center;min-width:140px">
+                            <i class="fas fa-brain"
+                                style="font-size:24px;color:var(--accent-purple);display:block;margin-bottom:8px"></i>
+                            <div style="font-size:13px;font-weight:600">AI Inference</div>
+                            <div style="font-size:11px;color:var(--text-muted)">4 Module Pipeline</div>
+                        </div>
+                        <i class="fas fa-arrow-right" style="color:var(--text-muted);font-size:20px"></i>
+                        <!-- Stage 4 -->
+                        <div
+                            style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:16px 20px;text-align:center;min-width:140px">
+                            <i class="fas fa-stream"
+                                style="font-size:24px;color:var(--accent-orange);display:block;margin-bottom:8px"></i>
+                            <div style="font-size:13px;font-weight:600">Data Stream</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Kafka / REST</div>
+                        </div>
+                        <i class="fas fa-arrow-right" style="color:var(--text-muted);font-size:20px"></i>
+                        <!-- Stage 5 -->
+                        <div
+                            style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:12px;padding:16px 20px;text-align:center;min-width:140px">
+                            <i class="fas fa-chart-line"
+                                style="font-size:24px;color:var(--accent-pink);display:block;margin-bottom:8px"></i>
+                            <div style="font-size:13px;font-weight:600">Dashboard</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Real-Time UI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module Processing Pipelines -->
+                <div class="section-header" style="margin-top:32px">
+                    <div class="section-icon cyan"><i class="fas fa-cogs"></i></div>
+                    <div>
+                        <div class="section-title">Module Processing Pipelines</div>
+                        <div class="section-subtitle">Step-by-step architecture of how each AI module processes video
+                            data</div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Counting Architecture -->
+                <div class="glass-card" style="margin-bottom:24px">
+                    <div class="glass-card-header">
+                        <i class="fas fa-car-side" style="color:var(--accent-cyan)"></i>
+                        <span class="glass-card-title">Vehicle Counting & Classification Pipeline</span>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/vehicle_architecture.png') }}"
+                        alt="Vehicle Counting Architecture"
+                        style="width:100%;border-radius:12px;margin-bottom:20px;border:1px solid var(--border-glass)">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+                        <div
+                            style="background:rgba(6,214,160,0.06);border:1px solid rgba(6,214,160,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-cyan);font-weight:700;margin-bottom:4px">STEP
+                                1</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Video Input</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Live or recorded stream at 1080p/4K, 30
+                                FPS</div>
+                        </div>
+                        <div
+                            style="background:rgba(6,214,160,0.06);border:1px solid rgba(6,214,160,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-cyan);font-weight:700;margin-bottom:4px">STEP
+                                2</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Frame Extraction</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Decode video into individual frames for
+                                processing</div>
+                        </div>
+                        <div
+                            style="background:rgba(6,214,160,0.06);border:1px solid rgba(6,214,160,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-cyan);font-weight:700;margin-bottom:4px">STEP
+                                3</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">YOLOv8 Nano Detection</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Object detection with bounding boxes &
+                                confidence scores</div>
+                        </div>
+                        <div
+                            style="background:rgba(6,214,160,0.06);border:1px solid rgba(6,214,160,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-cyan);font-weight:700;margin-bottom:4px">STEP
+                                4</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Classification</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Categorize into car, motorcycle, bus,
+                                truck (COCO classes)</div>
+                        </div>
+                        <div
+                            style="background:rgba(6,214,160,0.06);border:1px solid rgba(6,214,160,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-cyan);font-weight:700;margin-bottom:4px">STEP
+                                5</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Counting & Analytics</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Aggregate counts, flow rates, peak
+                                traffic analysis</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANPR Architecture -->
+                <div class="glass-card" style="margin-bottom:24px">
+                    <div class="glass-card-header">
+                        <i class="fas fa-id-card" style="color:var(--accent-blue)"></i>
+                        <span class="glass-card-title">ANPR Processing Pipeline</span>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/anpr_architecture.png') }}" alt="ANPR Architecture"
+                        style="width:100%;border-radius:12px;margin-bottom:20px;border:1px solid var(--border-glass)">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+                        <div
+                            style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-blue);font-weight:700;margin-bottom:4px">STEP
+                                1</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Frame Capture</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Extract frames containing vehicles with
+                                plates</div>
+                        </div>
+                        <div
+                            style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-blue);font-weight:700;margin-bottom:4px">STEP
+                                2</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Plate Localization</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Contour detection finds rectangular
+                                plate regions (AR 1.5–6.0)</div>
+                        </div>
+                        <div
+                            style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-blue);font-weight:700;margin-bottom:4px">STEP
+                                3</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Image Preprocessing</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Grayscale, bilateral filter, adaptive
+                                thresholding</div>
+                        </div>
+                        <div
+                            style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-blue);font-weight:700;margin-bottom:4px">STEP
+                                4</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">EasyOCR Extraction</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Neural OCR reads characters from plate
+                                region</div>
+                        </div>
+                        <div
+                            style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-blue);font-weight:700;margin-bottom:4px">STEP
+                                5</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Database & Alerts</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Match against watchlists, flag stolen
+                                vehicles</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facial Recognition Architecture -->
+                <div class="glass-card" style="margin-bottom:24px">
+                    <div class="glass-card-header">
+                        <i class="fas fa-user-shield" style="color:var(--accent-purple)"></i>
+                        <span class="glass-card-title">Facial Recognition Pipeline</span>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/face_architecture.png') }}"
+                        alt="Face Recognition Architecture"
+                        style="width:100%;border-radius:12px;margin-bottom:20px;border:1px solid var(--border-glass)">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+                        <div
+                            style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-purple);font-weight:700;margin-bottom:4px">
+                                STEP 1</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Live Video Feed</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Real-time camera stream input</div>
+                        </div>
+                        <div
+                            style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-purple);font-weight:700;margin-bottom:4px">
+                                STEP 2</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Face Detection</div>
+                            <div style="font-size:11px;color:var(--text-muted)">OpenCV Haar/DNN detects face bounding
+                                regions</div>
+                        </div>
+                        <div
+                            style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-purple);font-weight:700;margin-bottom:4px">
+                                STEP 3</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Feature Extraction</div>
+                            <div style="font-size:11px;color:var(--text-muted)">DeepFace/VGG-Face extracts 128D
+                                embedding vector</div>
+                        </div>
+                        <div
+                            style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-purple);font-weight:700;margin-bottom:4px">
+                                STEP 4</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Attribute Analysis</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Predict age, gender, emotion, and race
+                                attributes</div>
+                        </div>
+                        <div
+                            style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-purple);font-weight:700;margin-bottom:4px">
+                                STEP 5</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Alerts & Audit</div>
+                            <div style="font-size:11px;color:var(--text-muted)">GDPR-compliant logging, watchlist
+                                matching</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- People Counting Architecture -->
+                <div class="glass-card" style="margin-bottom:32px">
+                    <div class="glass-card-header">
+                        <i class="fas fa-users" style="color:var(--accent-orange)"></i>
+                        <span class="glass-card-title">People Counting & Gender Classification Pipeline</span>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/people_architecture.png') }}"
+                        alt="People Counting Architecture"
+                        style="width:100%;border-radius:12px;margin-bottom:20px;border:1px solid var(--border-glass)">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+                        <div
+                            style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-orange);font-weight:700;margin-bottom:4px">
+                                STEP 1</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Crowd Video Input</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Camera feeds from crowded environments
+                            </div>
+                        </div>
+                        <div
+                            style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-orange);font-weight:700;margin-bottom:4px">
+                                STEP 2</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">YOLOv8 Person Detection</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Detect all persons with bounding boxes
+                                (class ID 0)</div>
+                        </div>
+                        <div
+                            style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-orange);font-weight:700;margin-bottom:4px">
+                                STEP 3</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Confidence Filtering</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Filter detections above 35% confidence
+                                threshold</div>
+                        </div>
+                        <div
+                            style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-orange);font-weight:700;margin-bottom:4px">
+                                STEP 4</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Density Heatmap</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Gaussian blur + JET colormap overlay
+                                visualization</div>
+                        </div>
+                        <div
+                            style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:10px;padding:14px">
+                            <div style="font-size:11px;color:var(--accent-orange);font-weight:700;margin-bottom:4px">
+                                STEP 5</div>
+                            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Analytics Dashboard</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Real-time counters, density levels,
+                                distribution charts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deployment Models -->
+                <div class="section-header" style="margin-top:16px">
+                    <div class="section-icon purple"><i class="fas fa-server"></i></div>
+                    <div>
+                        <div class="section-title">Deployment Models</div>
+                        <div class="section-subtitle">Flexible architecture for different use-case scales</div>
+                    </div>
+                </div>
+
+                <div class="arch-grid" style="margin-bottom:28px">
+                    <!-- Edge -->
+                    <div class="arch-layer edge">
+                        <div class="arch-layer-title">
+                            <i class="fas fa-microchip" style="color:var(--accent-cyan)"></i>
+                            Edge Deployment
+                        </div>
+                        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">
+                            Local processing on embedded devices for minimal latency and bandwidth.
+                            Ideal for distributed cameras at traffic intersections.
+                        </p>
+                        <div class="arch-layer-content">
+                            <div class="arch-component"><i class="fas fa-bolt"></i> NVIDIA Jetson Xavier / Orin</div>
+                            <div class="arch-component"><i class="fas fa-usb"></i> Google Coral USB Accelerator</div>
+                            <div class="arch-component"><i class="fas fa-compress-arrows-alt"></i> INT8 Model
+                                Quantization</div>
+                            <div class="arch-component"><i class="fas fa-wifi"></i> Local MQTT / Edge Gateway</div>
+                            <div class="arch-component"><i class="fas fa-tachometer-alt"></i>
+                                < 50ms Inference Latency</div>
+                            </div>
+                            <div style="margin-top:16px;display:flex;gap:8px">
+                                <span class="badge green"><i class="fas fa-check"></i> Low Latency</span>
+                                <span class="badge green"><i class="fas fa-check"></i> Bandwidth Efficient</span>
+                            </div>
+                        </div>
+
+                        <!-- Server -->
+                        <div class="arch-layer server">
+                            <div class="arch-layer-title">
+                                <i class="fas fa-server" style="color:var(--accent-blue)"></i>
+                                Server Deployment
+                            </div>
+                            <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">
+                                Centralized processing on high-performance servers or cloud platforms.
+                                Scalable analytics across large camera networks.
+                            </p>
+                            <div class="arch-layer-content">
+                                <div class="arch-component"><i class="fas fa-gpu-card"></i> NVIDIA RTX / A100 GPUs</div>
+                                <div class="arch-component"><i class="fas fa-memory"></i> 64GB+ RAM, Multi-Core CPU
+                                </div>
+                                <div class="arch-component"><i class="fas fa-cloud"></i> AWS / Google Cloud / Azure
+                                </div>
+                                <div class="arch-component"><i class="fas fa-database"></i> Scalable Cloud Storage</div>
+                                <div class="arch-component"><i class="fas fa-layer-group"></i> Parallel Stream
+                                    Processing</div>
+                            </div>
+                            <div style="margin-top:16px;display:flex;gap:8px">
+                                <span class="badge blue"><i class="fas fa-check"></i> Scalable</span>
+                                <span class="badge blue"><i class="fas fa-check"></i> Centralized</span>
+                            </div>
+                        </div>
+
+                        <!-- Hybrid -->
+                        <div class="arch-layer hybrid">
+                            <div class="arch-layer-title">
+                                <i class="fas fa-cloud" style="color:var(--accent-purple)"></i>
+                                Hybrid Architecture
+                            </div>
+                            <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">
+                                Lightweight models at the edge for rapid inference, complex models in
+                                the cloud for high accuracy and aggregation.
+                            </p>
+                            <div class="arch-layer-content">
+                                <div class="arch-component"><i class="fas fa-exchange-alt"></i> Edge-Cloud Collaboration
+                                </div>
+                                <div class="arch-component"><i class="fas fa-sitemap"></i> Hierarchical Architecture
+                                </div>
+                                <div class="arch-component"><i class="fas fa-sync-alt"></i> Federated Learning</div>
+                                <div class="arch-component"><i class="fas fa-balance-scale"></i> Load Balancing</div>
+                                <div class="arch-component"><i class="fas fa-expand-arrows-alt"></i> 100+ Camera Support
+                                </div>
+                            </div>
+                            <div style="margin-top:16px;display:flex;gap:8px">
+                                <span class="badge purple"><i class="fas fa-check"></i> Best of Both</span>
+                                <span class="badge purple"><i class="fas fa-check"></i> Adaptive</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hardware Requirements -->
+                    <div class="section-header" style="margin-top:16px">
+                        <div class="section-icon orange"><i class="fas fa-hdd"></i></div>
+                        <div>
+                            <div class="section-title">Hardware Requirements</div>
+                            <div class="section-subtitle">Recommended specifications for edge and server deployments
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="two-col">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-microchip" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Edge Devices</span>
+                            </div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Specification</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Processor</td>
+                                        <td>NVIDIA Jetson Xavier NX / Orin</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Accelerator</td>
+                                        <td>Google Coral USB / Movidius</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RAM</td>
+                                        <td>4 GB minimum</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Video Input</td>
+                                        <td>1080p @ 30+ FPS</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Storage</td>
+                                        <td>32 GB eMMC / MicroSD</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Power</td>
+                                        <td>10W – 30W range</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fallback</td>
+                                        <td>Raspberry Pi 4 + AI HAT</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-server" style="color:var(--accent-blue)"></i>
+                                <span class="glass-card-title">Server Infrastructure</span>
+                            </div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Specification</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>CPU</td>
+                                        <td>Multi-core (Xeon / EPYC)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GPU</td>
+                                        <td>NVIDIA RTX 4090 / A100</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RAM</td>
+                                        <td>64 GB+</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Storage</td>
+                                        <td>NVMe SSD + Cloud S3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Network</td>
+                                        <td>10 GbE / InfiniBand</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Streams</td>
+                                        <td>100+ concurrent HD</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cloud</td>
+                                        <td>AWS / GCP / Azure</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

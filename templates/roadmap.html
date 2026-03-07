@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analytics — Roadmap</title>
+    <meta name="description" content="Implementation roadmap and risk assessment for the AI video analytics platform.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+    <div class="app-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/modules" class="nav-item">
+                    <i class="fas fa-cubes"></i> Modules
+                </a>
+                <a href="/stream" class="nav-item">
+                    <i class="fas fa-video"></i> Live Analysis
+                </a>
+                <a href="/architecture" class="nav-item"><i class="fas fa-project-diagram"></i> Architecture</a>
+                <a href="/roadmap" class="nav-item active"><i class="fas fa-road"></i> Roadmap</a>
+                <a href="/specs" class="nav-item"><i class="fas fa-file-alt"></i> Specifications</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="system-status"><span class="status-dot"></span> System Online</div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon cyan"><i class="fas fa-road"></i></div>
+                    <div>
+                        <div class="section-title">Implementation Roadmap</div>
+                        <div class="section-subtitle">Four-phase development plan from prototype to full deployment
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="timeline" style="margin-bottom:48px">
+                    <!-- Phase 1 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot cyan"></div>
+                        <div class="timeline-phase" style="color:var(--accent-cyan)">Phase 1</div>
+                        <div class="timeline-title">Prototyping & Model Selection</div>
+                        <div class="timeline-body">
+                            Foundation phase — select, fine-tune and benchmark AI models for each module.
+                            Build initial processing pipelines and a basic dashboard interface.
+                        </div>
+                        <ul class="timeline-tasks">
+                            <li><i class="fas fa-check-circle"></i> Evaluate YOLOv8 variants for vehicle & people
+                                detection</li>
+                            <li><i class="fas fa-check-circle"></i> Benchmark EasyOCR vs Tesseract for ANPR accuracy
+                            </li>
+                            <li><i class="fas fa-check-circle"></i> Integrate DeepFace with bias mitigation testing</li>
+                            <li><i class="fas fa-check-circle"></i> Develop edge and server processing pipelines</li>
+                            <li><i class="fas fa-check-circle"></i> Implement basic dashboard interface</li>
+                        </ul>
+                        <div style="margin-top:12px">
+                            <div class="progress-bar-container">
+                                <div class="progress-label">
+                                    <span class="progress-label-text">Phase Progress</span>
+                                    <span class="progress-label-value">100%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill" data-width="100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot purple"></div>
+                        <div class="timeline-phase" style="color:var(--accent-purple)">Phase 2</div>
+                        <div class="timeline-title">Pilot Testing & Iteration</div>
+                        <div class="timeline-body">
+                            Deploy in controlled environments — traffic intersections, public spaces.
+                            Gather metrics, identify failure cases, and iterate on accuracy.
+                        </div>
+                        <ul class="timeline-tasks">
+                            <li><i class="fas fa-circle" style="color:var(--accent-purple)"></i> Deploy at 3–5 test
+                                intersections with edge devices</li>
+                            <li><i class="fas fa-circle" style="color:var(--accent-purple)"></i> Measure mAP, FPS, and
+                                latency under real conditions</li>
+                            <li><i class="fas fa-circle" style="color:var(--accent-purple)"></i> Identify occlusion,
+                                lighting, and weather failure cases</li>
+                            <li><i class="fas fa-circle" style="color:var(--accent-purple)"></i> Iterate model
+                                fine-tuning with collected data</li>
+                            <li><i class="fas fa-circle" style="color:var(--accent-purple)"></i> Stress-test
+                                multi-stream server processing</li>
+                        </ul>
+                        <div style="margin-top:12px">
+                            <div class="progress-bar-container">
+                                <div class="progress-label">
+                                    <span class="progress-label-text">Phase Progress</span>
+                                    <span class="progress-label-value">45%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill purple" data-width="45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot orange"></div>
+                        <div class="timeline-phase" style="color:var(--accent-orange)">Phase 3</div>
+                        <div class="timeline-title">Full Deployment & Integration</div>
+                        <div class="timeline-body">
+                            Scale system across city-wide camera networks. Integrate with law enforcement
+                            and traffic management databases. Implement full security & privacy measures.
+                        </div>
+                        <ul class="timeline-tasks">
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Scale to 100+ cameras
+                                across city grid</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Integrate with law
+                                enforcement databases</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Deploy Apache Kafka for
+                                distributed streaming</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Implement GDPR/CCPA
+                                compliance pipeline</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Role-based access control
+                                on dashboard</li>
+                        </ul>
+                        <div style="margin-top:12px">
+                            <div class="progress-bar-container">
+                                <div class="progress-label">
+                                    <span class="progress-label-text">Phase Progress</span>
+                                    <span class="progress-label-value">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill orange" data-width="0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot red"></div>
+                        <div class="timeline-phase" style="color:var(--accent-red)">Phase 4</div>
+                        <div class="timeline-title">Maintenance & Expansion</div>
+                        <div class="timeline-body">
+                            Continuous model retraining, performance monitoring, and feature expansion
+                            including emotion/behavior analysis and predictive analytics.
+                        </div>
+                        <ul class="timeline-tasks">
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Automated model retraining
+                                pipelines</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Performance monitoring &
+                                alerting system</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Add emotion/behavior
+                                analysis module</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Predictive traffic flow
+                                analytics</li>
+                            <li><i class="fas fa-circle" style="color:var(--text-muted)"></i> Cross-city federation and
+                                data sharing</li>
+                        </ul>
+                        <div style="margin-top:12px">
+                            <div class="progress-bar-container">
+                                <div class="progress-label">
+                                    <span class="progress-label-text">Phase Progress</span>
+                                    <span class="progress-label-value">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill orange" data-width="0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Assessment -->
+                <div class="section-header">
+                    <div class="section-icon pink"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div>
+                        <div class="section-title">Risk Assessment Matrix</div>
+                        <div class="section-subtitle">Identified risks and mitigation strategies</div>
+                    </div>
+                </div>
+
+                <div class="risk-grid">
+                    <div class="risk-card">
+                        <div class="risk-card-header">
+                            <div class="risk-card-title">
+                                <i class="fas fa-microchip" style="color:var(--accent-blue)"></i>
+                                Technical Risks
+                            </div>
+                            <span class="risk-level medium">Medium</span>
+                        </div>
+                        <div class="risk-card-body">
+                            Model inaccuracies under adverse conditions, latency spikes during peak load, hardware
+                            compatibility issues.
+                        </div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--accent-cyan)">
+                            <i class="fas fa-shield-alt"></i> Rigorous testing, model ensembles, edge optimization
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-card-header">
+                            <div class="risk-card-title">
+                                <i class="fas fa-cogs" style="color:var(--accent-orange)"></i>
+                                Operational Risks
+                            </div>
+                            <span class="risk-level medium">Medium</span>
+                        </div>
+                        <div class="risk-card-body">
+                            System failures, integration bottlenecks between modules, camera feed interruptions, network
+                            outages.
+                        </div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--accent-cyan)">
+                            <i class="fas fa-shield-alt"></i> Redundant architecture, load testing, microservices
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-card-header">
+                            <div class="risk-card-title">
+                                <i class="fas fa-user-shield" style="color:var(--accent-red)"></i>
+                                Privacy & Ethical Risks
+                            </div>
+                            <span class="risk-level high">High</span>
+                        </div>
+                        <div class="risk-card-body">
+                            Bias in facial recognition, misuse of surveillance data, consent violations, demographic
+                            profiling concerns.
+                        </div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--accent-cyan)">
+                            <i class="fas fa-shield-alt"></i> Bias mitigation, audit logs, legal compliance
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-card-header">
+                            <div class="risk-card-title">
+                                <i class="fas fa-lock" style="color:var(--accent-red)"></i>
+                                Security Risks
+                            </div>
+                            <span class="risk-level high">High</span>
+                        </div>
+                        <div class="risk-card-body">
+                            Data breaches, unauthorized access to facial recognition databases, adversarial attacks on
+                            AI models.
+                        </div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--accent-cyan)">
+                            <i class="fas fa-shield-alt"></i> Encryption, access controls, security audits
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-card-header">
+                            <div class="risk-card-title">
+                                <i class="fas fa-gavel" style="color:var(--accent-orange)"></i>
+                                Regulatory Risks
+                            </div>
+                            <span class="risk-level medium">Medium</span>
+                        </div>
+                        <div class="risk-card-body">
+                            Non-compliance with evolving privacy laws across jurisdictions, regulatory changes affecting
+                            surveillance tech.
+                        </div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--accent-cyan)">
+                            <i class="fas fa-shield-alt"></i> Legal review, modular design for regional compliance
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
