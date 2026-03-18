@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Dashboard — Secure Video Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .log-table-container {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: 24px;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .log-table th {
+            text-align: left;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .log-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-glass);
+            color: var(--text-primary);
+        }
+
+        .log-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .event-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .event-success {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        .event-failure {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+        }
+
+        .event-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .event-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="/modules" class="nav-item">
+                    <i class="fas fa-cubes"></i> Modules
+                </a>
+                <a href="/stream" class="nav-item">
+                    <i class="fas fa-video"></i> Live Analysis
+                </a>
+                <div class="nav-section-label">Security</div>
+                <a href="/security-dashboard" class="nav-item active">
+                    <i class="fas fa-shield-halved"></i> Security Dashboard
+                </a>
+                {% if session.role == 'admin' %}
+                <a href="/user-management" class="nav-item">
+                    <i class="fas fa-users-gear"></i> User Management
+                </a>
+                {% endif %}
+                <a href="/logout" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="hero" style="min-height: 250px;">
+                <div class="hero-bg-grid"></div>
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-shield-heart"></i> Cybersecurity Monitor
+                    </div>
+                    <h1>Security <span class="gradient-text">Dashboard</span></h1>
+                    <p>Real-time threat monitoring, access audits, and system security events.</p>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="stats-grid">
+                    <div class="stat-card orange">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon orange"><i class="fas fa-user-xmark"></i></div>
+                        </div>
+                        <div class="stat-card-value">{{ failed_logins }}</div>
+                        <div class="stat-card-label">Failed Logins (Today)</div>
+                    </div>
+                    <div class="stat-card cyan">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon cyan"><i class="fas fa-ban"></i></div>
+                        </div>
+                        <div class="stat-card-value">{{ blocked_ips }}</div>
+                        <div class="stat-card-label">Blocked IP Addresses</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon blue"><i class="fas fa-list-check"></i></div>
+                        </div>
+                        <div class="stat-card-value">{{ watchlist_updates }}</div>
+                        <div class="stat-card-label">Watchlist Updates (Today)</div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon purple"><i class="fas fa-hand-paper"></i></div>
+                        </div>
+                        <div class="stat-card-value">{{ unauthorized_attempts }}</div>
+                        <div class="stat-card-label">Unauthorized Access Denied</div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <div class="section-icon blue"><i class="fas fa-history"></i></div>
+                    <div>
+                        <div class="section-title">Recent Security Events</div>
+                        <div class="section-subtitle">Comprehensive audit trail of system activities</div>
+                    </div>
+                </div>
+
+                <div class="log-table-container">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Event</th>
+                                <th>User</th>
+                                <th>IP Address</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td style="color: var(--text-muted); font-family: 'JetBrains Mono'; font-size: 12px;">{{
+                                    log.timestamp }}</td>
+                                <td>
+                                    <span class="event-badge 
+                                        {% if 'Success' in log.event %}event-success
+                                        {% elif 'Failed' in log.event or 'Denied' in log.event %}event-failure
+                                        {% elif 'Attempt' in log.event or 'Block' in log.event %}event-warning
+                                        {% else %}event-info{% endif %}">
+                                        {{ log.event }}
+                                    </span>
+                                </td>
+                                <td>{{ log.user or 'SYSTEM' }}</td>
+                                <td style="font-family: 'JetBrains Mono';">{{ log.ip }}</td>
+                                <td style="font-size: 13px; color: var(--text-secondary);">{{ log.details }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analytics — Specifications</title>
+    <meta name="description"
+        content="Technical specifications, model benchmarks, compliance checklists, and glossary for the AI video analytics platform.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+    <div class="app-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/modules" class="nav-item">
+                    <i class="fas fa-cubes"></i> Modules
+                </a>
+                <a href="/stream" class="nav-item">
+                    <i class="fas fa-video"></i> Live Analysis
+                </a>
+                <a href="/architecture" class="nav-item"><i class="fas fa-project-diagram"></i> Architecture</a>
+                <a href="/roadmap" class="nav-item"><i class="fas fa-road"></i> Roadmap</a>
+                <a href="/specs" class="nav-item active"><i class="fas fa-file-alt"></i> Specifications</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="system-status"><span class="status-dot"></span> System Online</div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon orange"><i class="fas fa-file-alt"></i></div>
+                    <div>
+                        <div class="section-title">Technical Specifications</div>
+                        <div class="section-subtitle">Model benchmarks, compliance checklists, and reference data</div>
+                    </div>
+                </div>
+
+                <!-- Model Comparison Table -->
+                <div class="glass-card" style="margin-bottom:28px">
+                    <div class="glass-card-header">
+                        <i class="fas fa-balance-scale" style="color:var(--accent-cyan)"></i>
+                        <span class="glass-card-title">AI Model Comparison — Object Detection</span>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>mAP (COCO)</th>
+                                    <th>FPS (GPU)</th>
+                                    <th>Parameters</th>
+                                    <th>GPU Memory</th>
+                                    <th>Edge Friendly</th>
+                                    <th>Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong style="color:var(--accent-cyan)">YOLOv8n</strong></td>
+                                    <td>37.3%</td>
+                                    <td><span class="badge green">80+ FPS</span></td>
+                                    <td>3.2M</td>
+                                    <td>~0.4 GB</td>
+                                    <td><span class="badge green">★★★</span></td>
+                                    <td>Edge (Low Power)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>YOLOv8s</strong></td>
+                                    <td>44.9%</td>
+                                    <td><span class="badge blue">50+ FPS</span></td>
+                                    <td>11.2M</td>
+                                    <td>~0.8 GB</td>
+                                    <td><span class="badge blue">★★☆</span></td>
+                                    <td>Mobile / Fast</td>
+                                </tr>
+                                <tr>
+                                    <td><strong style="color:var(--accent-purple)">YOLOv8l</strong></td>
+                                    <td>52.9%</td>
+                                    <td><span class="badge orange">25+ FPS</span></td>
+                                    <td>43.7M</td>
+                                    <td>~1.2 GB</td>
+                                    <td><span class="badge orange">★☆☆</span></td>
+                                    <td>High Precision</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>YOLOv8x</strong></td>
+                                    <td>53.9%</td>
+                                    <td><span class="badge red">15+ FPS</span></td>
+                                    <td>68.2M</td>
+                                    <td>~1.8 GB</td>
+                                    <td><span class="badge red">☆☆☆</span></td>
+                                    <td>Benchmark Max</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Faster R-CNN</strong></td>
+                                    <td>42.0%</td>
+                                    <td><span class="badge red">5-8 FPS</span></td>
+                                    <td>41.8M</td>
+                                    <td>~8 GB</td>
+                                    <td><span class="badge red">☆☆☆</span></td>
+                                    <td>High accuracy only</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SSD MobileNet</strong></td>
+                                    <td>29.0%</td>
+                                    <td><span class="badge green">50+ FPS</span></td>
+                                    <td>6.8M</td>
+                                    <td>~1 GB</td>
+                                    <td><span class="badge green">★★★</span></td>
+                                    <td>Ultra-lightweight</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Performance Charts -->
+                <div class="charts-grid" style="margin-bottom:28px">
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-chart-pie" style="color:var(--accent-purple)"></i>
+                            <span class="glass-card-title">System Resource Allocation</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="resourceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-chart-radar" style="color:var(--accent-cyan)"></i>
+                            <span class="glass-card-title">Module Capability Radar</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module Performance Table -->
+                <div class="glass-card" style="margin-bottom:28px">
+                    <div class="glass-card-header">
+                        <i class="fas fa-tachometer-alt" style="color:var(--accent-blue)"></i>
+                        <span class="glass-card-title">Module Performance Summary</span>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Module</th>
+                                    <th>Model</th>
+                                    <th>Accuracy</th>
+                                    <th>Speed</th>
+                                    <th>Latency</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><i class="fas fa-car" style="color:var(--accent-cyan)"></i> Vehicle Counter</td>
+                                    <td>YOLOv8l (Large)</td>
+                                    <td>mAP > 92.5%</td>
+                                    <td>25+ FPS</td>
+                                    <td>
+                                        < 10ms</td>
+                                    <td><span class="badge green"><i class="fas fa-check"></i> Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-id-card" style="color:var(--accent-blue)"></i> ANPR</td>
+                                    <td>YOLOv8n + EasyOCR</td>
+                                    <td>> 96% OCR</td>
+                                    <td>12-15 FPS</td>
+                                    <td>
+                                        < 100ms</td>
+                                    <td><span class="badge green"><i class="fas fa-check"></i> Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-user-shield" style="color:var(--accent-purple)"></i> Face
+                                        Recognition</td>
+                                    <td>RetinaFace + Facenet</td>
+                                    <td>99.38% Acc</td>
+                                    <td>8-10 FPS</td>
+                                    <td>~300ms</td>
+                                    <td><span class="badge green"><i class="fas fa-check"></i> Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-users" style="color:var(--accent-orange)"></i> People Counter
+                                    </td>
+                                    <td>YOLOv8l (Large)</td>
+                                    <td>> 91.2%</td>
+                                    <td>25+ FPS</td>
+                                    <td>
+                                        < 12ms</td>
+                                    <td><span class="badge green"><i class="fas fa-check"></i> Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-gun" style="color:#ef4444"></i> Weapon Detection</td>
+                                    <td>Weapon-v2 Custom</td>
+                                    <td>mAP > 94.0%</td>
+                                    <td>35+ FPS</td>
+                                    <td>
+                                        < 8ms</td>
+                                    <td><span class="badge green"><i class="fas fa-check"></i> Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-running" style="color:#8b5cf6"></i> Behavior Analysis</td>
+                                    <td>YOLOv8n-Pose</td>
+                                    <td>94.5% Keypoint</td>
+                                    <td>60+ FPS</td>
+                                    <td>
+                                        < 15ms</td>
+                                    <td><span class="badge green"><i class="fas fa-check"></i> Active</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Compliance Checklist -->
+                <div class="two-col" style="margin-bottom:28px">
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-shield-alt" style="color:var(--accent-cyan)"></i>
+                            <span class="glass-card-title">GDPR Compliance Checklist</span>
+                        </div>
+                        <div class="checklist">
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Data minimization — only collect necessary data
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Consent-based data collection and processing
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Right to access, rectify, and erase personal data
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Data Protection Impact Assessment (DPIA)
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Anonymization and pseudonymization options
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Data breach notification within 72 hours
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Cross-border data transfer safeguards
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-flag-usa" style="color:var(--accent-blue)"></i>
+                            <span class="glass-card-title">CCPA Compliance Checklist</span>
+                        </div>
+                        <div class="checklist">
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Right to know what data is collected
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Right to delete personal information
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Right to opt-out of data sale
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Non-discrimination for exercising rights
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Privacy policy with data categories disclosed
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                "Do Not Sell My Info" link on public pages
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-icon"><i class="fas fa-check"></i></div>
+                                Data inventory and mapping maintained
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Glossary -->
+                <div class="glass-card">
+                    <div class="glass-card-header">
+                        <i class="fas fa-book" style="color:var(--accent-orange)"></i>
+                        <span class="glass-card-title">Glossary of Key Terms</span>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Term</th>
+                                    <th>Definition</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>mAP</strong></td>
+                                    <td>Mean Average Precision — standard metric for object detection model accuracy
+                                        across IoU thresholds.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>YOLOv8</strong></td>
+                                    <td>You Only Look Once v8 — state-of-the-art real-time object detection model by
+                                        Ultralytics.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ANPR</strong></td>
+                                    <td>Automatic Number Plate Recognition — system for detecting and reading vehicle
+                                        license plates.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>OCR</strong></td>
+                                    <td>Optical Character Recognition — technology to convert images of text into
+                                        machine-readable text.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DeepFace</strong></td>
+                                    <td>Lightweight Python framework for facial recognition and attribute analysis (age,
+                                        gender, emotion).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>FPS</strong></td>
+                                    <td>Frames Per Second — measurement of video processing speed and real-time
+                                        capability.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Edge Computing</strong></td>
+                                    <td>Processing data locally on devices near the source, reducing latency and
+                                        bandwidth usage.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Model Quantization</strong></td>
+                                    <td>Technique to reduce model size and increase inference speed by using lower
+                                        precision (INT8).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Federated Learning</strong></td>
+                                    <td>Machine learning approach where models train on decentralized data without
+                                        sharing raw data.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GDPR</strong></td>
+                                    <td>General Data Protection Regulation — EU regulation on data protection and
+                                        privacy.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CCPA</strong></td>
+                                    <td>California Consumer Privacy Act — state-level data privacy law for California
+                                        residents.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>IoU</strong></td>
+                                    <td>Intersection over Union — metric measuring overlap between predicted and
+                                        ground-truth bounding boxes.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Resource Allocation Doughnut
+            createDoughnutChart('resourceChart',
+                ['Vehicle Detection', 'ANPR', 'Face Recognition', 'People Counting', 'System Overhead'],
+                [30, 20, 25, 15, 10],
+                ['#06d6a0', '#3b82f6', '#8b5cf6', '#f59e0b', '#64748b']
+            );
+
+            // Capability Radar
+            createRadarChart('radarChart',
+                ['Accuracy', 'Speed', 'Scalability', 'Privacy', 'Edge Ready', 'Robustness'],
+                [92, 85, 78, 90, 80, 75],
+                'System Capability Score'
+            );
+        });
+    </script>
+</body>
+
+</html>

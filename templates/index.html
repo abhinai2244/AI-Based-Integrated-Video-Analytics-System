@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analytics — Dashboard</title>
+    <meta name="description"
+        content="AI-powered integrated video analytics dashboard for smart cities — vehicle counting, ANPR, facial recognition, and people counting.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item active">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="/modules" class="nav-item">
+                    <i class="fas fa-cubes"></i> Modules
+                </a>
+                <a href="/stream" class="nav-item">
+                    <i class="fas fa-video"></i> Live Analysis
+                </a>
+
+                <div class="nav-section-label">Security</div>
+                {% if session.role in ['admin', 'auditor'] %}
+                <a href="/security-dashboard" class="nav-item">
+                    <i class="fas fa-shield-halved"></i> Security Dashboard
+                </a>
+                {% endif %}
+
+                {% if session.role == 'admin' %}
+                <a href="/user-management" class="nav-item">
+                    <i class="fas fa-users-gear"></i> User Management
+                </a>
+                {% endif %}
+
+                <a href="/logout" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="system-status" id="syncStatus">
+                    <span class="status-dot"></span>
+                    System Online — All Modules Active
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-bg-grid"></div>
+                <div class="hero-glow hero-glow-1"></div>
+                <div class="hero-glow hero-glow-2"></div>
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-user-circle"></i> Logged in as: {{ session.username }} ({{ session.role }})
+                    </div>
+                    <h1>
+                        Integrated <span class="gradient-text">Video Analytics</span><br>
+                        Intelligence Platform
+                    </h1>
+                    <p>
+                        AI-driven video analytics combining vehicle counting, ANPR, facial recognition,
+                        and people counting. Restricted access surveillance platform.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Stats Overview -->
+            <section class="section">
+                <div class="stats-grid">
+                    <div class="stat-card cyan fade-in">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon cyan"><i class="fas fa-car"></i></div>
+                        </div>
+                        <div class="stat-card-value"><span class="count-up" data-target="4">4</span></div>
+                        <div class="stat-card-label">AI Modules Active</div>
+                        <div class="stat-card-change up"><i class="fas fa-check"></i> All Online</div>
+                    </div>
+                    <div class="stat-card purple fade-in fade-in-delay-1">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon purple"><i class="fas fa-brain"></i></div>
+                        </div>
+                        <div class="stat-card-value"><span class="count-up" data-target="90" data-suffix="%">90%</span>
+                        </div>
+                        <div class="stat-card-label">Avg. Detection Accuracy</div>
+                        <div class="stat-card-change up"><i class="fas fa-arrow-up"></i> mAP Score</div>
+                    </div>
+                    <div class="stat-card blue fade-in fade-in-delay-2">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon blue"><i class="fas fa-tachometer-alt"></i></div>
+                        </div>
+                        <div class="stat-card-value"><span class="count-up" data-target="30" data-suffix=" FPS">30
+                                FPS</span></div>
+                        <div class="stat-card-label">Processing Speed</div>
+                        <div class="stat-card-change up"><i class="fas fa-bolt"></i> Real-Time</div>
+                    </div>
+                    <div class="stat-card orange fade-in fade-in-delay-3">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon orange"><i class="fas fa-clock"></i></div>
+                        </div>
+                        <div class="stat-card-value"><span class="count-up" data-prefix="<" data-target="2"
+                                data-suffix="s">&#60;2s</span></div>
+                        <div class="stat-card-label">End-to-End Latency</div>
+                        <div class="stat-card-change up"><i class="fas fa-arrow-down"></i> Optimized</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Modules Overview -->
+            <section class="section" style="padding-top: 0;">
+                <div class="section-header">
+                    <div class="section-icon cyan"><i class="fas fa-cubes"></i></div>
+                    <div>
+                        <div class="section-title">Core AI Modules</div>
+                        <div class="section-subtitle">Four integrated intelligence modules with live demo capabilities
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modules-grid">
+                    <a href="/modules" class="module-card vehicle" style="text-decoration:none;color:inherit">
+                        <div class="module-card-icon cyan"><i class="fas fa-car-side"></i></div>
+                        <div class="module-card-title">Vehicle Counting & Classification</div>
+                        <div class="module-card-desc">Real-time detection and classification of cars, motorcycles,
+                            buses, and trucks using YOLOv8 Nano with >90% mAP accuracy.</div>
+                        <div class="module-card-meta">
+                            <span class="meta-tag"><i class="fas fa-microchip"></i> YOLOv8n</span>
+                            <span class="meta-tag"><i class="fas fa-bullseye"></i> mAP >90%</span>
+                            <span class="meta-tag"><i class="fas fa-tachometer-alt"></i> 30+ FPS</span>
+                        </div>
+                    </a>
+                    <a href="/modules" class="module-card anpr" style="text-decoration:none;color:inherit">
+                        <div class="module-card-icon blue"><i class="fas fa-id-card"></i></div>
+                        <div class="module-card-title">Automatic Number Plate Recognition</div>
+                        <div class="module-card-desc">License plate detection and OCR extraction supporting
+                            multi-regional formats. Integrates with enforcement databases.</div>
+                        <div class="module-card-meta">
+                            <span class="meta-tag"><i class="fas fa-font"></i> EasyOCR</span>
+                            <span class="meta-tag"><i class="fas fa-bullseye"></i> >95% Accuracy</span>
+                            <span class="meta-tag"><i class="fas fa-globe"></i> Multi-Region</span>
+                        </div>
+                    </a>
+                    <a href="http://localhost:3000/" class="module-card face"
+                        style="text-decoration:none;color:inherit">
+                        <div class="module-card-icon purple"><i class="fas fa-user-shield"></i></div>
+                        <div class="module-card-title">Facial Recognition System</div>
+                        <div class="module-card-desc">Face detection with age, gender, emotion and race analysis.
+                            Privacy-compliant with GDPR/CCPA audit logging.</div>
+                        <div class="module-card-meta">
+                            <span class="meta-tag"><i class="fas fa-brain"></i> DeepFace</span>
+                            <span class="meta-tag"><i class="fas fa-bullseye"></i> 99% Accuracy</span>
+                            <span class="meta-tag"><i class="fas fa-shield-alt"></i> GDPR</span>
+                        </div>
+                    </a>
+                    <a href="/modules" class="module-card people" style="text-decoration:none;color:inherit">
+                        <div class="module-card-icon orange"><i class="fas fa-users"></i></div>
+                        <div class="module-card-title">People Counting & Gender Classification</div>
+                        <div class="module-card-desc">Crowd counting with density heatmaps and gender classification.
+                            Robust in high-density environments.</div>
+                        <div class="module-card-meta">
+                            <span class="meta-tag"><i class="fas fa-microchip"></i> YOLOv8n</span>
+                            <span class="meta-tag"><i class="fas fa-bullseye"></i> >90% Accuracy</span>
+                            <span class="meta-tag"><i class="fas fa-fire"></i> Heatmaps</span>
+                        </div>
+                    </a>
+                    <a href="/modules" class="module-card weapon" style="text-decoration:none;color:inherit">
+                        <div class="module-card-icon red"><i class="fas fa-hard-hat"></i></div>
+                        <div class="module-card-title">Helmet Detection & Safety Compliance</div>
+                        <div class="module-card-desc">Detects motorcycle riders and verifies helmet usage in real-time.
+                            Automatically logs safety violations and alerts officials.</div>
+                        <div class="module-card-meta">
+                            <span class="meta-tag"><i class="fas fa-hard-hat"></i> Dual-AI</span>
+                            <span class="meta-tag"><i class="fas fa-shield-alt"></i> Compliance</span>
+                            <span class="meta-tag"><i class="fas fa-bell"></i> Alerts</span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Performance Charts -->
+            <section class="section" style="padding-top: 0;">
+                <div class="section-header">
+                    <div class="section-icon purple"><i class="fas fa-chart-bar"></i></div>
+                    <div>
+                        <div class="section-title">Performance Metrics</div>
+                        <div class="section-subtitle">AI model benchmarks and system capabilities</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-bullseye" style="color:var(--accent-cyan)"></i>
+                            <span class="glass-card-title">Model Accuracy (mAP %)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="accuracyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-tachometer-alt" style="color:var(--accent-purple)"></i>
+                            <span class="glass-card-title">Processing Speed (FPS)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="speedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Architecture -->
+            <section class="section" style="padding-top: 0;">
+                <div class="section-header">
+                    <div class="section-icon blue"><i class="fas fa-network-wired"></i></div>
+                    <div>
+                        <div class="section-title">System Architecture</div>
+                        <div class="section-subtitle">Edge-to-cloud processing pipeline overview</div>
+                    </div>
+                </div>
+
+                <div class="arch-grid">
+                    <div class="arch-layer edge">
+                        <div class="arch-layer-title">
+                            <i class="fas fa-microchip" style="color:var(--accent-cyan)"></i>
+                            Edge Processing
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component"><i class="fas fa-video"></i> HD Camera Feeds (1080p/4K)</div>
+                            <div class="arch-component"><i class="fas fa-bolt"></i> NVIDIA Jetson Xavier/Orin</div>
+                            <div class="arch-component"><i class="fas fa-cog"></i> YOLOv8 Nano Inference</div>
+                            <div class="arch-component"><i class="fas fa-compress-arrows-alt"></i> Model Quantization
+                                (INT8)</div>
+                        </div>
+                    </div>
+                    <div class="arch-layer server">
+                        <div class="arch-layer-title">
+                            <i class="fas fa-server" style="color:var(--accent-blue)"></i>
+                            Server Processing
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component"><i class="fas fa-database"></i> Centralized Data Store</div>
+                            <div class="arch-component"><i class="fas fa-brain"></i> Full-Size Model Inference</div>
+                            <div class="arch-component"><i class="fas fa-chart-line"></i> Real-Time Dashboard</div>
+                            <div class="arch-component"><i class="fas fa-shield-alt"></i> API Gateway & Auth</div>
+                        </div>
+                    </div>
+                    <div class="arch-layer hybrid">
+                        <div class="arch-layer-title">
+                            <i class="fas fa-cloud" style="color:var(--accent-purple)"></i>
+                            Cloud Analytics
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component"><i class="fas fa-stream"></i> Apache Kafka Streaming</div>
+                            <div class="arch-component"><i class="fas fa-project-diagram"></i> Distributed Computing
+                            </div>
+                            <div class="arch-component"><i class="fas fa-archive"></i> Long-term Storage & Archival
+                            </div>
+                            <div class="arch-component"><i class="fas fa-robot"></i> Model Retraining Pipeline</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Initialize dashboard charts
+        document.addEventListener('DOMContentLoaded', () => {
+            // Accuracy Chart
+            createBarChart('accuracyChart',
+                ['Vehicle Detection', 'ANPR (OCR)', 'Face Recognition', 'People Counting'],
+                [{
+                    label: 'Accuracy %',
+                    data: [92, 95, 99, 91],
+                    backgroundColor: [
+                        'rgba(6, 214, 160, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(245, 158, 11, 0.7)'
+                    ],
+                    borderColor: [
+                        '#06d6a0', '#3b82f6', '#8b5cf6', '#f59e0b'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barPercentage: 0.6
+                }]
+            );
+
+            // Speed Chart
+            createBarChart('speedChart',
+                ['YOLOv8n (Edge)', 'YOLOv8s (Server)', 'EasyOCR', 'DeepFace'],
+                [{
+                    label: 'FPS',
+                    data: [45, 30, 15, 12],
+                    backgroundColor: [
+                        'rgba(6, 214, 160, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(245, 158, 11, 0.7)'
+                    ],
+                    borderColor: [
+                        '#06d6a0', '#3b82f6', '#8b5cf6', '#f59e0b'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barPercentage: 0.6
+                }]
+            );
+        });
+    </script>
+</body>
+
+</html>

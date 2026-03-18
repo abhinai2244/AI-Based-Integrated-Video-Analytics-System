@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analytics — Modules</title>
+    <meta name="description"
+        content="AI module deep-dives with live demo capabilities for vehicle detection, ANPR, facial recognition, and people counting.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .live-module-video {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        .live-module-video:hover {
+            transform: scale(1.02);
+        }
+
+        .result-image-container {
+            position: relative;
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-glass);
+            min-height: 200px;
+            max-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-image-container img.result-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .result-image-label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Standard results grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Full-width side-by-side layout refinement when live analysis is active */
+        .live-analysis-mode .results-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            grid-auto-flow: row;
+            gap: 20px;
+        }
+
+        .live-analysis-mode .result-image-container {
+            height: auto;
+            aspect-ratio: 16 / 9;
+            max-height: 450px;
+            border-width: 2px;
+            background: #0b0f19;
+        }
+
+        /* Highlight the containers in live mode */
+        .live-analysis-mode .live-video-container,
+        .live-analysis-mode .result-image-container {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .live-analysis-mode .result-data {
+            grid-column: 1 / span 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+            margin-top: 10px;
+        }
+
+        /* Ensure stats list in data panel also looks good full-width */
+        .live-analysis-mode .detections-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .tabs {
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            gap: 8px !important;
+            padding: 8px !important;
+            scrollbar-width: none;
+            /* Hide scrollbar for cleaner look */
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            flex-shrink: 0 !important;
+        }
+
+        @media (max-width: 1200px) {
+            .results-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .live-analysis-mode .result-image-container {
+                aspect-ratio: auto;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Analyzing image with AI models...</div>
+    </div>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                    <div class="sidebar-subtitle">AI Platform</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section-label">Navigation</div>
+                <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/modules" class="nav-item active">
+                    <i class="fas fa-cubes"></i> Modules
+                </a>
+                <a href="/stream" class="nav-item">
+                    <i class="fas fa-video"></i> Live Analysis
+                </a>
+                <a href="/architecture" class="nav-item"><i class="fas fa-project-diagram"></i> Architecture</a>
+                <a href="/roadmap" class="nav-item"><i class="fas fa-road"></i> Roadmap</a>
+                <a href="/specs" class="nav-item"><i class="fas fa-file-alt"></i> Specifications</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    System Online — All Modules Active
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Page Header -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon cyan"><i class="fas fa-cubes"></i></div>
+                    <div>
+                        <div class="section-title">AI Module Deep Dive</div>
+                        <div class="section-subtitle">Explore each module's technical specs and try live AI demos</div>
+                    </div>
+                </div>
+
+                <!-- Module Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tab-vehicle" onclick="switchTab('tab-vehicle')">
+                        <i class="fas fa-car-side"></i> Vehicle Counter
+                    </button>
+                    <button class="tab-btn" data-tab="tab-anpr" onclick="switchTab('tab-anpr')">
+                        <i class="fas fa-id-card"></i> ANPR
+                    </button>
+                    <button class="tab-btn" data-tab="tab-face" onclick="window.location.href='http://localhost:3000/'">
+                        <i class="fas fa-user-shield"></i> Facial Recognition
+                    </button>
+                    <button class="tab-btn" data-tab="tab-people" onclick="switchTab('tab-people')">
+                        <i class="fas fa-users"></i> People Counter
+                    </button>
+                    <button class="tab-btn" data-tab="tab-weapon" onclick="switchTab('tab-weapon')">
+                        <i class="fas fa-gun"></i> Weapon Detection
+                    </button>
+                    <button class="tab-btn" data-tab="tab-behavior" onclick="switchTab('tab-behavior')">
+                        <i class="fas fa-running"></i> Behavior Analysis
+                    </button>
+                    <button class="tab-btn" data-tab="tab-helmet" onclick="switchTab('tab-helmet')">
+                        <i class="fas fa-hard-hat"></i> Helmet Detection
+                    </button>
+                    <button class="tab-btn" data-tab="tab-video" onclick="switchTab('tab-video')">
+                        <i class="fas fa-video"></i> Video Analysis
+                    </button>
+                </div>
+
+                <!-- ═══ Vehicle Counter Tab ═══ -->
+                <div class="tab-pane active" id="tab-vehicle">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Detects and classifies vehicles in real-time using <strong
+                                    style="color:var(--accent-cyan)">YOLOv8</strong>.
+                                Supports car, motorcycle, bus, and truck classification with centroid tracking and speed
+                                estimation.
+                                Optimized for edge deployment.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Mean Average Precision</span>
+                                        <span class="progress-label-value">94.5%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="94%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Processing Speed</span>
+                                        <span class="progress-label-value">60+ FPS</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="95%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Edge Optimization</span>
+                                        <span class="progress-label-value">NVIDIA TensorRT</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill blue" data-width="90%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">AI Model</td>
+                                        <td>YOLOv8l (Large)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Tracking</td>
+                                        <td>Centroid-based (K-Search)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Classes</td>
+                                        <td>Car, Motorcycle, Bus, Truck</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Accuracy</td>
+                                        <td><span class="badge green">mAP > 92%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Latency</td>
+                                        <td>~ 10ms (Inference)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Speed Est.</td>
+                                        <td>Distance-Time Pixel Integration</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Edge Device</td>
+                                        <td>NVIDIA Jetson AGX / RTX 30+</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Live Demo -->
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-cyan)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="vehicleUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop an image or video here or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div
+                            style="display:flex;align-items:center;gap:10px;margin:20px 0;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:12px;">
+                            <label class="switch-container"
+                                style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+                                <div style="position:relative;width:40px;height:20px;background:rgba(255,255,255,0.1);border-radius:20px;transition:0.3s;"
+                                    class="switch-bg">
+                                    <div style="position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;transition:0.3s;"
+                                        class="switch-dot"></div>
+                                </div>
+                                <input type="checkbox" id="vehicleNV" style="display:none;"
+                                    onchange="this.previousElementSibling.style.background=this.checked?'var(--accent-cyan)':'rgba(255,255,255,0.1)';this.previousElementSibling.children[0].style.left=this.checked?'22px':'2px';">
+                                <span style="font-size:13px;font-weight:600;"><i class="fas fa-moon"
+                                        style="color:var(--accent-cyan);"></i> Night Vision Mode</span>
+                            </label>
+                            <span style="font-size:11px;color:var(--text-muted);">(Enhances low-light images before
+                                analysis)</span>
+                        </div>
+
+                        <div class="results-panel" id="vehicleResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-car-side"></i> Vehicle Detection View
+                                    </div>
+                                    <img class="result-image" alt="Annotated vehicle detection result">
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(6,214,160,0.12);color:var(--accent-cyan)">
+                                            <i class="fas fa-car"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">Total Vehicles Detected</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:4px">
+                                        <i class="fas fa-list" style="color:var(--accent-cyan)"></i> Detection Breakdown
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ ANPR Tab ═══ -->
+                <div class="tab-pane" id="tab-anpr">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-blue)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                High-accuracy plate detection using <strong style="color:var(--accent-blue)">fine-tuned
+                                    YOLOv8</strong> (best.pt)
+                                paired with <strong style="color:var(--accent-blue)">EasyOCR</strong> for precise
+                                alphanumeric extraction.
+                                Specifically optimized for Indian license plate formats and low-light conditions.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Plate Detection Rate</span>
+                                        <span class="progress-label-value">98.5%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill blue" data-width="98%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">OCR Accuracy (Standard)</span>
+                                        <span class="progress-label-value">96.8%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="96%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Processing Latency</span>
+                                        <span class="progress-label-value">
+                                            < 120ms</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="92%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-blue)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Detection</td>
+                                        <td>Fine-tuned YOLOv8 (best.pt)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">OCR Engine</td>
+                                        <td>EasyOCR (Deep Learning)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Formats</td>
+                                        <td>HSRP, Standard, Multi-line</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Accuracy</td>
+                                        <td><span class="badge blue">95.0</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Latency</td>
+                                        <td>~ 120ms (End-to-End)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Enhancement</td>
+                                        <td>Bilateral Denoising + CLAHE</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Robustness</td>
+                                        <td>Motion Blur, Skew Correction</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-ban" style="color:#ef4444"></i>
+                            <span class="glass-card-title">Manage Blacklist</span>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-bottom: 16px;">
+                            <input type="text" id="blacklistInput" placeholder="Enter License Plate (e.g. MH12AB1234)"
+                                class="data-table"
+                                style="flex:1; background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px;border-radius:8px;">
+                            <button id="addBlacklistBtn" class="tab-btn active" style="padding: 8px 16px;"><i
+                                    class="fas fa-plus"></i> Add</button>
+                        </div>
+                        <div id="blacklistContainer" class="detections-list"
+                            style="max-height: 200px; overflow-y: auto;">
+                            <div style="color:var(--text-muted); padding: 8px;">Loading blacklist...</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-blue)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image or Video</span>
+                        </div>
+                        <div class="upload-zone" id="anprUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop image or video with plates or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div
+                            style="display:flex;align-items:center;gap:10px;margin:20px 0;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:12px;">
+                            <label class="switch-container"
+                                style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+                                <div style="position:relative;width:40px;height:20px;background:rgba(255,255,255,0.1);border-radius:20px;transition:0.3s;"
+                                    class="switch-bg">
+                                    <div style="position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;transition:0.3s;"
+                                        class="switch-dot"></div>
+                                </div>
+                                <input type="checkbox" id="anprNV" style="display:none;"
+                                    onchange="this.previousElementSibling.style.background=this.checked?'var(--accent-blue)':'rgba(255,255,255,0.1)';this.previousElementSibling.children[0].style.left=this.checked?'22px':'2px';">
+                                <span style="font-size:13px;font-weight:600;"><i class="fas fa-moon"
+                                        style="color:var(--accent-blue);"></i> Night Vision Mode</span>
+                            </label>
+                            <span style="font-size:11px;color:var(--text-muted);">(Enhances low-light images before
+                                analysis)</span>
+                        </div>
+
+                        <div class="results-panel" id="anprResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-id-card"></i> License Plate View
+                                    </div>
+                                    <img class="result-image" alt="ANPR annotated result">
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(59,130,246,0.12);color:var(--accent-blue)">
+                                            <i class="fas fa-id-card"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">Plates Detected</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:4px">
+                                        <i class="fas fa-list" style="color:var(--accent-blue)"></i> Recognized Plates
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Face Recognition Tab ═══ -->
+                <div class="tab-pane" id="tab-face">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-purple)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Advanced face analysis powered by <strong
+                                    style="color:var(--accent-purple)">DeepFace</strong> (VGG-Face, FaceNet).
+                                Extracts identity, age, gender, and emotion with high precision even in crowded
+                                environments.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Face Recognition Accuracy</span>
+                                        <span class="progress-label-value">90.5%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="99%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Attribute Estimation (Age/Gender)</span>
+                                        <span class="progress-label-value">91%+</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="91%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Processing Performance</span>
+                                        <span class="progress-label-value">Parallel GPU Ops</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill blue" data-width="100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-purple)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Framework</td>
+                                        <td>DeepFace + TensorFlow</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Model Backends</td>
+                                        <td>VGG-Face, FaceNet, ArcFace</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Attributes</td>
+                                        <td>Age, Gender, Emotion</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Latency</td>
+                                        <td>~ 250ms (Analysis Pulse)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Detection</td>
+                                        <td>RetinaFace (State-of-the-art)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Embeddings</td>
+                                        <td>FaceNet512 / ArcFace</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Logging</td>
+                                        <td>Encrypted Access Logs</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Authorization</td>
+                                        <td>Unauthorized Match Alerts</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-check-circle" style="color:#06d6a0"></i>
+                            <span class="glass-card-title">Manage Whitelist</span>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-bottom: 16px; flex-wrap:wrap;">
+                            <input type="text" id="whitelistName" placeholder="Enter Authorized Person's Name"
+                                class="data-table"
+                                style="flex:1; min-width:200px; background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px;border-radius:8px;">
+                            <input type="file" id="whitelistImage" accept="image/*" multiple webkitdirectory directory
+                                class="data-table"
+                                style="flex:1; min-width:200px; background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:4px;border-radius:8px;">
+                            <button id="addWhitelistBtn" class="tab-btn active"
+                                style="padding: 8px 16px; white-space:nowrap;"><i class="fas fa-user-plus"></i>
+                                Add</button>
+                        </div>
+                        <div id="whitelistContainer" class="detections-list"
+                            style="max-height: 200px; overflow-y: auto;">
+                            <div style="color:var(--text-muted); padding: 8px;">Loading whitelist...</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-exclamation-triangle" style="color:#ef476f"></i>
+                            <span class="glass-card-title">Manage Blacklist</span>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-bottom: 16px; flex-wrap:wrap;">
+                            <input type="text" id="faceBlacklistName" placeholder="Enter Blacklisted Person's Name"
+                                class="data-table"
+                                style="flex:1; min-width:200px; background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:8px;border-radius:8px;">
+                            <input type="file" id="faceBlacklistImage" accept="image/*" multiple webkitdirectory
+                                directory class="data-table"
+                                style="flex:1; min-width:200px; background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-primary);padding:4px;border-radius:8px;">
+                            <button id="addFaceBlacklistBtn" class="tab-btn active"
+                                style="padding: 8px 16px; white-space:nowrap; background:var(--accent-red)"><i
+                                    class="fas fa-user-slash"></i>
+                                Flag</button>
+                        </div>
+                        <div id="faceBlacklistContainer" class="detections-list"
+                            style="max-height: 200px; overflow-y: auto;">
+                            <div style="color:var(--text-muted); padding: 8px;">Loading blacklist...</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-purple)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="faceUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop photo or video with faces or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div
+                            style="display:flex;align-items:center;gap:10px;margin:20px 0;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:12px;">
+                            <label class="switch-container"
+                                style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+                                <div style="position:relative;width:40px;height:20px;background:rgba(255,255,255,0.1);border-radius:20px;transition:0.3s;"
+                                    class="switch-bg">
+                                    <div style="position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;transition:0.3s;"
+                                        class="switch-dot"></div>
+                                </div>
+                                <input type="checkbox" id="faceNV" style="display:none;"
+                                    onchange="this.previousElementSibling.style.background=this.checked?'var(--accent-purple)':'rgba(255,255,255,0.1)';this.previousElementSibling.children[0].style.left=this.checked?'22px':'2px';">
+                                <span style="font-size:13px;font-weight:600;"><i class="fas fa-moon"
+                                        style="color:var(--accent-purple);"></i> Night Vision Mode</span>
+                            </label>
+                            <span style="font-size:11px;color:var(--text-muted);">(Enhances low-light images before
+                                analysis)</span>
+                        </div>
+
+                        <div class="results-panel" id="faceResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-user-shield"></i> Face Analysis View
+                                    </div>
+                                    <img class="result-image" alt="Face recognition annotated result">
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(139,92,246,0.12);color:var(--accent-purple)">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">Faces Detected</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:4px">
+                                        <i class="fas fa-list" style="color:var(--accent-purple)"></i> Face Analysis
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ People Counter Tab ═══ -->
+                <div class="tab-pane" id="tab-people">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-orange)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Real-time people counting using <strong style="color:var(--accent-orange)">YOLOv8
+                                    Large</strong> with crowd density heatmap generation.
+                                Provides high-precision density level estimation (Low/Medium/High/Very High) using
+                                geometric centroids.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Detection Accuracy</span>
+                                        <span class="progress-label-value">91%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill orange" data-width="91%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Gender Classification</span>
+                                        <span class="progress-label-value">90%+</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="90%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Crowd Robustness</span>
+                                        <span class="progress-label-value">High Density</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="87%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-orange)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">AI Model</td>
+                                        <td>YOLOv8l (Large) + DeepFace</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Tracking</td>
+                                        <td>Kalman Filter, Blob Analysis</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Outputs</td>
+                                        <td>Count, Density, Heatmap</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Gender Acc.</td>
+                                        <td><span class="badge orange">>90%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Environments</td>
+                                        <td>Stations, Malls, Events</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Density Levels</td>
+                                        <td>Low / Medium / High / Very High</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Visualization</td>
+                                        <td>JET Colormap Heatmaps</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-orange)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="peopleUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop image or video with people or click to upload</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4, AVI, WebM — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div
+                            style="display:flex;align-items:center;gap:10px;margin:20px 0;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:12px;">
+                            <label class="switch-container"
+                                style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+                                <div style="position:relative;width:40px;height:20px;background:rgba(255,255,255,0.1);border-radius:20px;transition:0.3s;"
+                                    class="switch-bg">
+                                    <div style="position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;transition:0.3s;"
+                                        class="switch-dot"></div>
+                                </div>
+                                <input type="checkbox" id="peopleNV" style="display:none;"
+                                    onchange="this.previousElementSibling.style.background=this.checked?'var(--accent-orange)':'rgba(255,255,255,0.1)';this.previousElementSibling.children[0].style.left=this.checked?'22px':'2px';">
+                                <span style="font-size:13px;font-weight:600;"><i class="fas fa-moon"
+                                        style="color:var(--accent-orange);"></i> Night Vision Mode</span>
+                            </label>
+                            <span style="font-size:11px;color:var(--text-muted);">(Enhances low-light images before
+                                analysis)</span>
+                        </div>
+
+                        <div class="results-panel" id="peopleResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-crosshairs"></i> Detection View
+                                    </div>
+                                    <img class="result-image" alt="People detection annotated result">
+                                </div>
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-fire"></i> Density Heatmap
+                                    </div>
+                                    <img class="heatmap-image" alt="Crowd density heatmap">
+                                </div>
+                            </div>
+
+                            <div class="result-data" style="margin-top:24px">
+                                <div
+                                    style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:20px;margin-bottom:20px">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">People Detected</div>
+                                        </div>
+                                    </div>
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">
+                                            <i class="fas fa-chart-area"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value density-value">—</div>
+                                            <div class="result-stat-label">Crowd Density</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gender-stats"
+                                    style="padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); border-radius:12px;">
+                                    <div style="color:var(--text-muted); font-size:12px; margin-bottom:4px">Gender
+                                        Distribution (Top Detections)</div>
+                                    <div style="display:flex; gap:15px">
+                                        <div style="color:var(--text-muted)">Awaiting analysis...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Weapon Detection Tab ═══ -->
+                <div class="tab-pane" id="tab-weapon">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-red)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Real-time detection of high-risk items including <strong
+                                    style="color:var(--accent-red)">firearms, knives, and explosives</strong>.
+                                Designed for public safety, transportation hubs, and restricted area monitoring.
+                                Integrates directly with the real-time alert engine.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Detection Recall</span>
+                                        <span class="progress-label-value">91.2%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill red" data-width="91%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">False Alarm Rate</span>
+                                        <span class="progress-label-value">
+                                            < 1.5%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill green" data-width="10%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Alert Latency</span>
+                                        <span class="progress-label-value">
+                                            < 80ms</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="95%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-red)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Inference Engine</td>
+                                        <td>YOLOv8s / Custom-Trained</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Weapon Classes</td>
+                                        <td>Pistol, Rifle, Knife, Explosive</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Response Time</td>
+                                        <td>Real-time (Active Stream)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Precision</td>
+                                        <td><span class="badge red">High Criticality</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Deployment</td>
+                                        <td>FP16/INT8 Quantized</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-red)"></i>
+                            <span class="glass-card-title">Live Demo — Upload an Image</span>
+                        </div>
+                        <div class="upload-zone" id="weaponUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="upload-zone-text">Drop image or video here to scan for weapons</div>
+                            <div class="upload-zone-hint">Supports JPG, PNG, MP4 — Max 50MB</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div class="results-panel" id="weaponResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-shield-alt"></i> Intelligence View
+                                    </div>
+                                    <img class="result-image" alt="Weapon detection result">
+                                </div>
+                                <div class="result-data">
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:20px;margin-bottom:20px">
+                                        <div class="result-stat">
+                                            <div class="result-stat-icon"
+                                                style="background:rgba(239, 68, 68, 0.12);color:var(--accent-red)">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </div>
+                                            <div>
+                                                <div class="result-stat-value total-count">0</div>
+                                                <div class="result-stat-label">Weapons Detected</div>
+                                            </div>
+                                        </div>
+                                        <div class="result-stat">
+                                            <div class="result-stat-icon"
+                                                style="background:rgba(239, 68, 68, 0.12);color:var(--accent-red)">
+                                                <i class="fas fa-bell"></i>
+                                            </div>
+                                            <div>
+                                                <div class="result-stat-value status-text">Clear</div>
+                                                <div class="result-stat-label">Safety Status</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detections-list">
+                                        <div style="color:var(--text-muted); font-size:13px; padding:10px">No high-risk
+                                            items found</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Helmet Detection Tab ═══ -->
+                <div class="tab-pane" id="tab-helmet">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Dual-AI system for road safety compliance. Detects motorcycle riders and identifies
+                                helmet usage status (With/Without).
+                                Provides instant visual alerts for safety violations.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Detection Accuracy</span>
+                                        <span class="progress-label-value">91.2%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" data-width="91%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Processing Latency</span>
+                                        <span class="progress-label-value">~180ms</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill purple" data-width="85%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Primary Model</td>
+                                        <td>YOLOv8 Nano (Person/Bike)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Secondary Model</td>
+                                        <td>Custom Helmet Classifier</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Input Format</td>
+                                        <td>Image / Video Stream</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Violation Trigger</td>
+                                        <td>"Without Helmet" Detection</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Live Demo Zone -->
+                    <div class="glass-card" id="helmetDemoZone">
+                        <div class="glass-card-header">
+                            <i class="fas fa-flask" style="color:var(--accent-cyan)"></i>
+                            <span class="glass-card-title">Helmet Detection Demo</span>
+                        </div>
+
+                        <div class="upload-zone" id="helmetUploadZone">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <div class="upload-text">Drop image or video here to test helmet detection</div>
+                            <div class="upload-subtext">Supports PNG, JPG, MP4, AVI</div>
+                            <input type="file" id="helmetInputFile" accept="image/*,video/*" style="display:none">
+                            <button class="tab-btn active" style="margin-top:20px"
+                                onclick="document.getElementById('helmetInputFile').click()">
+                                <i class="fas fa-folder-open"></i> Browse Files
+                            </button>
+                        </div>
+
+                        <div class="results-panel" id="helmetResults" style="display:none; margin-top:28px">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-motorcycle"></i> Helmet Analysis View
+                                    </div>
+                                    <img class="result-image" alt="Helmet detection annotated result">
+                                    <div class="live-status-badge" style="display:none">
+                                        <span class="status-dot"></span> LIVE ANALYSIS
+                                    </div>
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(34,211,238,0.12);color:var(--accent-cyan)">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">Riders Detected</div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:4px">
+                                        <i class="fas fa-list" style="color:var(--accent-cyan)"></i> Detection Summary
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Behavior Analysis Tab ═══ -->
+                <div class="tab-pane" id="tab-behavior">
+                    <div class="two-col" style="margin-bottom:28px">
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-pink)"></i>
+                                <span class="glass-card-title">Module Overview</span>
+                            </div>
+                            <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+                                Uses <strong style="color:var(--accent-pink)">YOLOv8-Pose Estimator</strong> to detect
+                                human skeletons and analyze activity.
+                                Automatically triggers alerts for <strong style="color:var(--accent-red)">Fall
+                                    Detection</strong> (Medical Emergency) and
+                                <strong style="color:var(--accent-orange)">Loitering</strong> in restricted zones.
+                            </p>
+                            <div style="display:flex;flex-direction:column;gap:12px">
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Fall Detection Accuracy</span>
+                                        <span class="progress-label-value">92.4%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill pink" data-width="92%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span class="progress-label-text">Skeleton Tracking Persistence</span>
+                                        <span class="progress-label-value">95%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill blue" data-width="95%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-cogs" style="color:var(--accent-pink)"></i>
+                                <span class="glass-card-title">Technical Specifications</span>
+                            </div>
+                            <table class="data-table">
+                                <tbody>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Pose Engine</td>
+                                        <td>YOLOv8n-Pose (17 Keypoints)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Alert Types</td>
+                                        <td>Fall, Loitering, Collision</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Inference Time</td>
+                                        <td>~ 15ms @ CPU</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Keypoints</td>
+                                        <td>COCO Skeleton Mapping</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:var(--text-muted)">Safety Compliance</td>
+                                        <td>OSHA-Compliant Monitoring</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="glass-card-header">
+                            <i class="fas fa-play-circle" style="color:var(--accent-pink)"></i>
+                            <span class="glass-card-title">Live Demo — Upload behavior video or image</span>
+                        </div>
+                        <div class="upload-zone" id="behaviorUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-running"></i></div>
+                            <div class="upload-zone-text">Drop behavioral media or click to upload</div>
+                            <div class="upload-zone-hint">Best for fall detection or loitering samples</div>
+                            <input type="file" accept="image/*,video/*">
+                        </div>
+
+                        <div class="results-panel" id="behaviorResults">
+                            <div class="results-grid">
+                                <div class="result-image-container">
+                                    <div class="result-image-label">
+                                        <i class="fas fa-running"></i> Pose & Activity Analysis
+                                    </div>
+                                    <img class="result-image" alt="Behavior Analysis Skeleton result">
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-stat">
+                                        <div class="result-stat-icon"
+                                            style="background:rgba(236,72,153,0.12);color:var(--accent-pink)">
+                                            <i class="fas fa-street-view"></i>
+                                        </div>
+                                        <div>
+                                            <div class="result-stat-value total-count">0</div>
+                                            <div class="result-stat-label">People Tracked</div>
+                                        </div>
+                                    </div>
+                                    <div class="detections-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Video Analysis Tab ═══ -->
+                <div class="tab-pane" id="tab-video">
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-info-circle" style="color:var(--accent-pink)"></i>
+                            <span class="glass-card-title">Unified Video Analysis</span>
+                        </div>
+                        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7">
+                            Upload a video file and the system will extract key frames and run <strong>all 4 AI
+                                modules</strong> simultaneously:
+                            Vehicle Detection, ANPR, Facial Recognition, and People Counting. Results are aggregated
+                            across sampled frames.
+                        </p>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom:28px">
+                        <div class="glass-card-header">
+                            <i class="fas fa-film" style="color:var(--accent-pink)"></i>
+                            <span class="glass-card-title">Upload Video for Analysis</span>
+                        </div>
+                        <div class="upload-zone" id="videoUpload">
+                            <div class="upload-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="upload-zone-text">Drop a video file here or click to upload</div>
+                            <div class="upload-zone-hint">Supports MP4, AVI, MOV, MKV, WebM — Max 50MB</div>
+                            <input type="file" accept="video/*">
+                        </div>
+                    </div>
+
+                    <!-- Video Results -->
+                    <div class="results-panel" id="videoResults">
+                        <!-- Video Info -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-info-circle" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Video Information</span>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px"
+                                id="videoInfoGrid">
+                            </div>
+                        </div>
+
+                        <!-- Summary Cards -->
+                        <div class="stats-grid" style="margin-bottom:24px">
+                            <div class="stat-card cyan">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon cyan"><i class="fas fa-car"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoVehicleCount">0</div>
+                                <div class="stat-card-label">Total Vehicles</div>
+                            </div>
+                            <div class="stat-card blue">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon blue"><i class="fas fa-id-card"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoPlateCount">0</div>
+                                <div class="stat-card-label">Unique Plates</div>
+                            </div>
+                            <div class="stat-card purple">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon purple"><i class="fas fa-user-shield"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoFaceCount">0</div>
+                                <div class="stat-card-label">Faces Detected</div>
+                            </div>
+                            <div class="stat-card orange">
+                                <div class="stat-card-header">
+                                    <div class="stat-card-icon orange"><i class="fas fa-users"></i></div>
+                                </div>
+                                <div class="stat-card-value" id="videoPeopleCount">0</div>
+                                <div class="stat-card-label">Max People Count</div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Breakdown -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-car-side" style="color:var(--accent-cyan)"></i>
+                                <span class="glass-card-title">Vehicle Breakdown</span>
+                            </div>
+                            <div id="videoVehicleBreakdown" class="detections-list"></div>
+                        </div>
+
+                        <!-- Plates Detected -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-id-card" style="color:var(--accent-blue)"></i>
+                                <span class="glass-card-title">License Plates Detected</span>
+                            </div>
+                            <div id="videoPlatesList" class="detections-list"></div>
+                        </div>
+
+                        <!-- Faces Detected -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-user-shield" style="color:var(--accent-purple)"></i>
+                                <span class="glass-card-title">Faces Analyzed</span>
+                            </div>
+                            <div id="videoFacesList" class="detections-list"></div>
+                        </div>
+
+                        <!-- People Density -->
+                        <div class="glass-card" style="margin-bottom:20px">
+                            <div class="glass-card-header">
+                                <i class="fas fa-users" style="color:var(--accent-orange)"></i>
+                                <span class="glass-card-title">Crowd Analysis</span>
+                            </div>
+                            <div id="videoPeopleSummary"></div>
+                        </div>
+
+                        <!-- Annotated Frames -->
+                        <div class="glass-card">
+                            <div class="glass-card-header">
+                                <i class="fas fa-images" style="color:var(--accent-pink)"></i>
+                                <span class="glass-card-title">Analyzed Frame Previews</span>
+                            </div>
+                            <div id="videoFramePreviews"
+                                style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize image upload zones
+            initUploadZone('vehicleUpload', '/api/detect-vehicles', renderVehicleResults);
+            initUploadZone('anprUpload', '/api/anpr', renderANPRResults);
+            initUploadZone('faceUpload', '/api/recognize-face', renderFaceResults);
+            initUploadZone('peopleUpload', '/api/count-people', renderPeopleResults);
+
+            // Initialize video upload zone
+            initVideoUpload();
+        });
+
+        function initVideoUpload() {
+            const zone = document.getElementById('videoUpload');
+            if (!zone) return;
+            const input = zone.querySelector('input[type="file"]');
+
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault(); zone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) processVideoUpload(e.dataTransfer.files[0]);
+            });
+            if (input) {
+                input.addEventListener('change', (e) => {
+                    if (e.target.files.length) processVideoUpload(e.target.files[0]);
+                });
+            }
+        }
+
+        function processVideoUpload(file) {
+            const validTypes = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm'];
+            if (!file.type.startsWith('video/')) {
+                showNotification('Please upload a video file (MP4, AVI, MOV, MKV, WebM)', 'error');
+                return;
+            }
+            if (file.size > 50 * 1024 * 1024) {
+                showNotification('File too large. Max 50MB.', 'error');
+                return;
+            }
+
+            showLoading(true);
+            const formData = new FormData();
+            formData.append('video', file);
+
+            fetch('/api/analyze-video', { method: 'POST', body: formData })
+                .then(res => { if (!res.ok) throw new Error(`Server error: ${res.status}`); return res.json(); })
+                .then(data => {
+                    showLoading(false);
+                    if (data.error) { showNotification(data.error, 'error'); }
+                    else { renderVideoResults(data); showNotification('Video analysis complete!', 'success'); }
+                })
+                .catch(err => { showLoading(false); showNotification('Video analysis failed: ' + err.message, 'error'); });
+        }
+
+        function renderVideoResults(data) {
+            const panel = document.getElementById('videoResults');
+            if (!panel) return;
+            panel.classList.add('visible');
+
+            // Video info
+            const info = data.video_info || {};
+            document.getElementById('videoInfoGrid').innerHTML = [
+                { l: 'Duration', v: info.duration + 's', c: 'cyan' },
+                { l: 'FPS', v: info.fps, c: 'blue' },
+                { l: 'Resolution', v: info.resolution, c: 'purple' },
+                { l: 'Total Frames', v: info.total_frames?.toLocaleString(), c: 'orange' },
+                { l: 'Frames Analyzed', v: info.frames_analyzed, c: 'pink' }
+            ].map(i => `<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);border-radius:10px;padding:14px;text-align:center">
+                <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:4px">${i.v}</div>
+                <div style="font-size:11px;color:var(--text-muted)">${i.l}</div>
+            </div>`).join('');
+
+            // Summary counts
+            const vs = data.vehicle_summary || {};
+            document.getElementById('videoVehicleCount').textContent = vs.total || 0;
+            document.getElementById('videoPlateCount').textContent = data.anpr_summary?.total_unique || 0;
+            document.getElementById('videoFaceCount').textContent = data.face_summary?.total_detected || 0;
+            document.getElementById('videoPeopleCount').textContent = data.people_summary?.max_count || 0;
+
+            // Vehicle breakdown
+            const vColors = { car: '#06d6a0', motorcycle: '#f59e0b', bus: '#3b82f6', truck: '#8b5cf6' };
+            const vCounts = vs.counts || {};
+            document.getElementById('videoVehicleBreakdown').innerHTML = Object.entries(vCounts).map(([t, c]) =>
+                `<div class="detection-item"><span class="detection-item-label"><span class="detection-dot" style="background:${vColors[t] || '#06d6a0'}"></span>${t.charAt(0).toUpperCase() + t.slice(1)}</span><span class="detection-conf">${c}</span></div>`
+            ).join('') || '<div style="color:var(--text-muted);font-size:13px">No vehicles detected</div>';
+
+            // Plates list
+            const plates = data.anpr_summary?.plates || [];
+            document.getElementById('videoPlatesList').innerHTML = plates.map(p =>
+                `<div class="detection-item"><span class="detection-item-label"><span class="detection-dot" style="background:#3b82f6"></span><strong>${p.text}</strong> <span style="color:var(--text-muted);font-size:11px">@ ${p.timestamp}s</span></span><span class="detection-conf">${(p.confidence * 100).toFixed(1)}%</span></div>`
+            ).join('') || '<div style="color:var(--text-muted);font-size:13px">No plates detected</div>';
+
+            // Faces list
+            const faces = data.face_summary?.faces || [];
+            document.getElementById('videoFacesList').innerHTML = faces.map(f =>
+                `<div class="detection-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+                    <span class="detection-item-label"><span class="detection-dot" style="background:#8b5cf6"></span><strong>Face #${f.id}</strong> <span style="color:var(--text-muted);font-size:11px">@ ${f.timestamp}s</span></span>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;padding-left:16px">
+                        <span class="meta-tag"><i class="fas fa-birthday-cake"></i> Age: ${f.age}</span>
+                        <span class="meta-tag"><i class="fas fa-venus-mars"></i> ${f.gender}</span>
+                        <span class="meta-tag"><i class="fas fa-smile"></i> ${f.emotion}</span>
+                    </div>
+                </div>`
+            ).join('') || '<div style="color:var(--text-muted);font-size:13px">No faces detected</div>';
+
+            // People summary
+            const ps = data.people_summary || {};
+            document.getElementById('videoPeopleSummary').innerHTML = `
+                <div style="display:flex;gap:20px;flex-wrap:wrap">
+                    <div class="result-stat" style="flex:1">
+                        <div class="result-stat-icon" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)"><i class="fas fa-users"></i></div>
+                        <div><div class="result-stat-value">${ps.max_count || 0}</div><div class="result-stat-label">Peak People Count</div></div>
+                    </div>
+                    <div class="result-stat" style="flex:1">
+                        <div class="result-stat-icon" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)"><i class="fas fa-chart-area"></i></div>
+                        <div><div class="result-stat-value">${ps.max_density || 'N/A'}</div><div class="result-stat-label">Peak Crowd Density</div></div>
+                    </div>
+                </div>`;
+
+            // Frame previews
+            const frames = data.frame_results || [];
+            document.getElementById('videoFramePreviews').innerHTML = frames.map(fr => {
+                let img = fr.vehicle_annotated || fr.people_annotated || fr.face_annotated || '';
+                if (!img) return '';
+                return `<div style="border:1px solid var(--border-glass);border-radius:12px;overflow:hidden">
+                    <div style="padding:8px 12px;font-size:12px;color:var(--text-muted);background:rgba(0,0,0,0.3)"><i class="fas fa-clock"></i> Frame @ ${fr.timestamp}s — ${fr.vehicles || 0} vehicles, ${fr.people || 0} people, ${fr.faces || 0} faces</div>
+                    <img src="data:image/jpeg;base64,${img}" style="width:100%;display:block" alt="Analyzed frame at ${fr.timestamp}s">
+                </div>`;
+            }).join('') || '<div style="color:var(--text-muted);font-size:13px">No frames to preview</div>';
+        }
+    </script>
+</body>
+
+</html>

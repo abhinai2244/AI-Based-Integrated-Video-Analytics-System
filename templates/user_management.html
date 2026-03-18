@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management — Secure Video Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .user-mgmt-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+        }
+
+        .form-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            height: fit-content;
+        }
+
+        .user-table-container {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th,
+        .user-table td {
+            text-align: left;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .user-table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .role-admin {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-purple);
+        }
+
+        .role-security_officer {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .role-operator {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        .role-auditor {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 6px;
+            color: #0a0e1a;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">VA</div>
+                <div>
+                    <div class="sidebar-title">Video Analytics</div>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <a href="/" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/security-dashboard" class="nav-item"><i class="fas fa-shield-halved"></i> Security</a>
+                <a href="/user-management" class="nav-item active"><i class="fas fa-users-gear"></i> Users</a>
+                <a href="/logout" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon purple"><i class="fas fa-users-gear"></i></div>
+                    <div>
+                        <div class="section-title">User Management</div>
+                        <div class="section-subtitle">Manage system access and roles</div>
+                    </div>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <div class="user-mgmt-container">
+                    <div class="form-card">
+                        <h3 style="margin-bottom: 20px;">Create New User</h3>
+                        <form method="POST">
+                            <input type="hidden" name="action" value="add">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" class="form-input" required>
+
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-input" required>
+                            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Min 8 chars, 1
+                                uppercase, 1 number.</p>
+
+                            <label class="form-label">Role</label>
+                            <select name="role" class="form-select">
+                                <option value="admin">Admin</option>
+                                <option value="security_officer">Security Officer</option>
+                                <option value="operator">Operator</option>
+                                <option value="auditor">Auditor</option>
+                            </select>
+
+                            <button type="submit" class="submit-btn">Add User</button>
+                        </form>
+                    </div>
+
+                    <div class="user-table-container">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Created At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td><strong>{{ user.username }}</strong></td>
+                                    <td><span class="role-badge role-{{ user.role }}">{{ user.role }}</span></td>
+                                    <td style="font-size: 12px; color: var(--text-muted);">{{ user.created_at }}</td>
+                                    <td>
+                                        {% if user.username != session.username %}
+                                        <form method="POST" style="display: inline;">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <button type="submit" class="delete-btn"
+                                                onclick="return confirm('Delete this user?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
